@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd frontend && pnpm install --no-frozen-lockfile && pnpm run build",
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
