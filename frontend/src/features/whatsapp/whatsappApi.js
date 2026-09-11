@@ -1,7 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api"
+import { apiBaseUrl } from "../../api/client.js"
 
 async function request(path, options = {}) {
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(`${apiBaseUrl}${path}`, {
     credentials: "include",
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options,
