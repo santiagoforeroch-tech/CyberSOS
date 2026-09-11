@@ -69,6 +69,7 @@
 - [ ] Preparar despliegues separados de desarrollo y producción, monitoreo y copias de seguridad.
   - [x] Preparar frontend Vite y FastAPI como servicios de Vercel con el mismo dominio (`/` y `/api`).
   - [x] Migrar la configuración a la sintaxis `services` actual de Vercel y enrutar explícitamente `/api` al backend.
+  - [x] Aclarar los errores de acceso administrativo para distinguir credenciales inválidas de fallos de conexión con Supabase.
   - [ ] Configurar las variables privadas de producción en Vercel y verificar el flujo completo antes de producción.
 
 ## Ampliación propuesta (pendiente de aprobación SENATIC)

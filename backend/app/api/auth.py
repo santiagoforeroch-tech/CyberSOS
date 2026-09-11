@@ -1,4 +1,5 @@
 import hmac
+import logging
 
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
@@ -8,6 +9,7 @@ from app.core.security import expected_admin_setup_key, require_mfa_pending, sig
 from app.services.supabase_auth import admin_auth_client, auth_client, require_institutional_admin
 
 router = APIRouter(prefix="/v1/auth", tags=["auth"])
+logger = logging.getLogger(__name__)
 
 
 class LoginInput(BaseModel):
@@ -77,6 +79,17 @@ def start_mfa(client, response: Response) -> dict:
     return {"mfa_required": True, "enrollment_required": enrollment is not None, "enrollment": enrollment}
 
 
+def login_error(exc: Exception) -> HTTPException:
+    """Devuelve un mensaje útil sin revelar detalles internos de Supabase."""
+    message = str(exc).casefold()
+    if "invalid login credentials" in message:
+        return HTTPException(401, "Correo o contraseña incorrectos")
+    if "email not confirmed" in message:
+        return HTTPException(401, "Confirma el correo de la cuenta administrativa antes de iniciar sesión")
+    logger.exception("No fue posible iniciar sesión con Supabase")
+    return HTTPException(503, "No fue posible conectar con Supabase. Revisa la configuración de Vercel e inténtalo nuevamente")
+
+
 @router.post("/login")
 def login(payload: LoginInput, response: Response) -> dict:
     if settings.auth_provider == "local":
@@ -96,7 +109,7 @@ def login(payload: LoginInput, response: Response) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(401, "No fue posible iniciar sesión con Supabase") from exc
+        raise login_error(exc) from exc
 
 
 @router.post("/register-admin", status_code=201)
