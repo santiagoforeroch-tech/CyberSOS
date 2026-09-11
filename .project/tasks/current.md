@@ -67,8 +67,8 @@
 - [ ] Añadir notificaciones institucionales sin incluir información sensible en el correo.
 - [ ] Automatizar retención de 90 días, auditoría y eliminación verificable.
 - [ ] Preparar despliegues separados de desarrollo y producción, monitoreo y copias de seguridad.
-  - [x] Preparar el frontend Vite para compilación en Vercel y publicación desde GitHub.
-  - [ ] Desplegar FastAPI en un servicio público, configurar `VITE_API_URL`/CORS y verificar el flujo completo antes de producción.
+  - [x] Preparar frontend Vite y FastAPI como servicios de Vercel con el mismo dominio (`/` y `/api`).
+  - [ ] Configurar las variables privadas de producción en Vercel y verificar el flujo completo antes de producción.
 
 ## Ampliación propuesta (pendiente de aprobación SENATIC)
 
