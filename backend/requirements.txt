@@ -1,0 +1,10 @@
+email-validator==2.3.0
+fastapi==0.141.1
+python-multipart==0.0.22
+pydantic-settings==2.15.0
+sqlalchemy==2.0.52
+psycopg[binary]==3.3.4
+supabase==2.31.0
+uvicorn[standard]==0.52.4
+httpx>=0.28,<1
+python-multipart>=0.0.20,<1

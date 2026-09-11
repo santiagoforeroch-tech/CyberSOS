@@ -1,0 +1,138 @@
+.wa-panel {
+  color: #17211d;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.wa-header,
+.wa-actions,
+.wa-layout,
+.wa-compose {
+  display: flex;
+  gap: 1rem;
+}
+
+.wa-header {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wa-eyebrow {
+  color: #167249;
+  font-weight: 700;
+  margin-bottom: .25rem;
+}
+
+.wa-local-note { color: #60767e; display: block; margin-top: .4rem; }
+
+.wa-info {
+  background: #e7f3ff;
+  border: 1px solid #b9ddf8;
+  border-radius: .7rem;
+  color: #174b78;
+  padding: 1rem;
+}
+
+.wa-panel button {
+  background: #167249;
+  border: 0;
+  border-radius: .7rem;
+  color: white;
+  cursor: pointer;
+  padding: .7rem 1rem;
+}
+
+.wa-panel button.wa-danger {
+  background: #9f2f2f;
+}
+
+.wa-error {
+  background: #fee7e7;
+  border-radius: .7rem;
+  color: #852121;
+  padding: 1rem;
+}
+
+.wa-qr {
+  background: white;
+  border: 1px solid #d5ded9;
+  border-radius: 1rem;
+  margin: 2rem auto;
+  max-width: 320px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.wa-layout {
+  align-items: stretch;
+  min-height: 560px;
+}
+
+.wa-conversations {
+  border-right: 1px solid #d5ded9;
+  flex: 0 0 300px;
+  padding-right: 1rem;
+}
+
+.wa-conversations button {
+  background: transparent;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: .5rem;
+  text-align: left;
+  width: 100%;
+}
+
+.wa-conversations button.is-active {
+  background: #e4f5ec;
+}
+
+.wa-conversations span,
+.wa-message small {
+  color: #5a6b63;
+}
+
+.wa-thread {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.wa-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: .75rem;
+  overflow: auto;
+}
+
+.wa-message {
+  background: #f1f3f2;
+  border-radius: .8rem;
+  max-width: 75%;
+  padding: .8rem 1rem;
+}
+
+.wa-message.outbound {
+  align-self: flex-end;
+  background: #d9fdd3;
+}
+
+.wa-compose {
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+.wa-compose textarea {
+  border: 1px solid #b7c4bd;
+  border-radius: .7rem;
+  min-height: 80px;
+  padding: .75rem;
+}
+
+@media (max-width: 760px) {
+  .wa-layout { flex-direction: column; }
+  .wa-conversations { border-bottom: 1px solid #d5ded9; border-right: 0; flex-basis: auto; }
+}

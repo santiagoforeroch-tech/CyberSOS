@@ -1,0 +1,39 @@
+from pathlib import Path
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
+
+class Settings(BaseSettings):
+    app_env: str = "development"
+    database_url: str = "sqlite:///./cybersos-dev.db"
+    frontend_origin: str = "http://localhost:5173"
+    supabase_service_role_key: str = ""
+    whatsapp_session_encryption_key: str = ""
+    whatsapp_webhook_secret: str | None = None
+    whatsapp_bridge_url: str = "http://127.0.0.1:3001"
+    whatsapp_admin_local: bool = True
+    whatsapp_max_media_mb: int = 20
+    session_secret: str = ""
+    cookie_secure: bool = False
+    retention_days: int = 90
+    public_report_rate_limit: int = 5
+    public_report_rate_window_seconds: int = 3600
+    auth_provider: str = "local"
+    supabase_url: str = ""
+    supabase_publishable_key: str = ""
+    supabase_secret_key: str = ""
+    supabase_admin_email: str = ""
+    local_admin_email: str = "admin@cybersos.example"
+    local_admin_password: str = ""
+    local_mfa_code: str = ""
+
+    model_config = SettingsConfigDict(
+        env_file=PROJECT_ROOT / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+
+settings = Settings()
