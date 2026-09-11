@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-11 (formularios administrativos):** El cliente web ahora convierte la lista de errores de validación de FastAPI en texto legible, por ejemplo “Revisa el campo email: …”, en vez de mostrar `[object Object]`. La API pública respondió `422` ante una solicitud deliberadamente inválida, sin crear ni modificar cuentas; ESLint correcto. Vitest sigue bloqueado por el permiso de lectura de esbuild sobre el directorio superior de OneDrive, no por una falla de pruebas detectada.
+
 - **Actualización 2026-09-11 (identidad visual):** Se reemplazó el símbolo anterior por un SVG plano y deliberadamente simple: escudo circular, punto de alerta ámbar y dos ondas de señal. Se retiró el degradado y la sombra para que funcione como una marca institucional diseñada, legible a tamaño pequeño y no como ilustración generativa. ESLint correcto. Falta publicar el cambio y comprobarlo en la URL pública.
 
 - **Actualización 2026-09-11 (acceso administrativo):** La prueba con un usuario ficticio confirmó que Supabase responde y rechaza correctamente credenciales inválidas. El mensaje anterior confundía ese rechazo con una falla de conexión. El inicio de sesión ahora indica “Correo o contraseña incorrectos”; los problemas reales de configuración o conexión responden `503` con un mensaje distinto y quedan registrados solo en los logs del servidor. Pytest `7/7` correcto. Falta publicar el cambio y que el administrador complete personalmente la prueba real con contraseña y MFA.
