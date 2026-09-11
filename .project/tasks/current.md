@@ -68,6 +68,7 @@
 - [ ] Automatizar retención de 90 días, auditoría y eliminación verificable.
 - [ ] Preparar despliegues separados de desarrollo y producción, monitoreo y copias de seguridad.
   - [x] Preparar frontend Vite y FastAPI como servicios de Vercel con el mismo dominio (`/` y `/api`).
+  - [x] Migrar la configuración a la sintaxis `services` actual de Vercel y enrutar explícitamente `/api` al backend.
   - [ ] Configurar las variables privadas de producción en Vercel y verificar el flujo completo antes de producción.
 
 ## Ampliación propuesta (pendiente de aprobación SENATIC)

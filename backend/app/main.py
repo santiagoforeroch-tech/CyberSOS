@@ -1,5 +1,3 @@
-import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,7 +21,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Vercel Services ya retira el prefijo /api antes de entregar la petición a
-# FastAPI. Localmente se conserva para no cambiar las URLs de desarrollo.
-api_prefix = "" if os.getenv("VERCEL") else "/api"
-app.include_router(api_router, prefix=api_prefix)
+# La configuración actual de Vercel Services conserva la ruta original al
+# aplicar los rewrites, igual que el entorno local.
+app.include_router(api_router, prefix="/api")
