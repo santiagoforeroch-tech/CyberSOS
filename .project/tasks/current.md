@@ -10,6 +10,7 @@
 - [x] Hacer que la bandeja administrativa se actualice automáticamente cada 15 segundos.
 - [x] Renovar la paleta visual a violeta y magenta.
 - [x] Crear e integrar el símbolo vectorial CyberSOS y su guía de marca.
+- [x] Sustituir el símbolo por una marca vectorial sobria de escudo, alerta y señal, sin degradados ni efectos generativos.
 - [x] Añadir métricas operativas: categorías, prioridades y tiempo medio de gestión.
 - [x] Añadir límite básico por IP para el formulario público.
 - [x] Renovar el inicio de sesión administrativo con ilustración original de respuesta cibernética y diseño adaptable.

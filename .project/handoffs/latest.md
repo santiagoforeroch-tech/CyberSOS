@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-11 (identidad visual):** Se reemplazó el símbolo anterior por un SVG plano y deliberadamente simple: escudo circular, punto de alerta ámbar y dos ondas de señal. Se retiró el degradado y la sombra para que funcione como una marca institucional diseñada, legible a tamaño pequeño y no como ilustración generativa. ESLint correcto. Falta publicar el cambio y comprobarlo en la URL pública.
+
 - **Actualización 2026-09-11 (acceso administrativo):** La prueba con un usuario ficticio confirmó que Supabase responde y rechaza correctamente credenciales inválidas. El mensaje anterior confundía ese rechazo con una falla de conexión. El inicio de sesión ahora indica “Correo o contraseña incorrectos”; los problemas reales de configuración o conexión responden `503` con un mensaje distinto y quedan registrados solo en los logs del servidor. Pytest `7/7` correcto. Falta publicar el cambio y que el administrador complete personalmente la prueba real con contraseña y MFA.
 
 - **Actualización 2026-09-11 (compatibilidad Vercel):** Vercel rechazó `experimentalServices` para proyectos nuevos. `vercel.json` ahora usa la sintaxis vigente `services`, con `frontend` y `backend` como raíces independientes y reglas explícitas que envían `/api/*` a FastAPI y el resto a Vite. La ruta llega a FastAPI conservando `/api`, por lo que el backend vuelve a declarar ese prefijo en todos los entornos. Verificación: JSON válido y Pytest `7/7`. El cambio debe enviarse a GitHub para que Vercel haga un nuevo despliegue; falta comprobar la URL pública.

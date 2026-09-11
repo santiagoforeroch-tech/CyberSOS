@@ -12,7 +12,7 @@ h1,h2,h3,p { margin-top: 0; }
 h1 { letter-spacing: -.045em; }
 .eyebrow { margin-bottom: 10px; color: #0b80a2; font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 1.18rem; font-weight: 800; }
-.brand-mark { display:block; flex:none; width:38px; height:38px; filter:drop-shadow(0 6px 12px #7c3aed2e); }
+.brand-mark { display:block; flex:none; width:38px; height:38px; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 22px; border: 1px solid var(--blue); border-radius: 11px; color: white; background: linear-gradient(135deg,var(--blue),#be185d); box-shadow: 0 10px 25px #6d28d92b; font-weight: 750; cursor: pointer; }
 .button:hover { transform: translateY(-1px); filter: brightness(1.04); }
 .button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
