@@ -16,7 +16,10 @@ router = APIRouter(prefix="/v1/reports", tags=["reports"])
 
 
 @router.post("", status_code=201)
-async def submit(request: Request, payload: str = Form(), evidence: list[UploadFile] = File(default=[]), db: Session = Depends(get_db)) -> dict:
+async def submit(request: Request, payload: str = Form(), website: str = Form(default=""), evidence: list[UploadFile] = File(default=[]), db: Session = Depends(get_db)) -> dict:
+    # Campo trampa: las personas nunca lo ven; los robots genéricos suelen llenarlo.
+    if website.strip():
+        raise HTTPException(422, "No fue posible validar el envío")
     try:
         report_payload = ReportCreate.model_validate(json.loads(payload))
     except json.JSONDecodeError as error:

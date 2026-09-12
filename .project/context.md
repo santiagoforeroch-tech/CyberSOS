@@ -6,9 +6,9 @@
 - **Fase actual:** Desarrollo
 - **Stack:** FastAPI, SQLAlchemy, PostgreSQL de Supabase, Vite React
 - **Autenticación:** Un administrador mediante Supabase Auth y MFA TOTP; ciudadanos sin cuenta
-- **Supabase project ref:** `byqympyzppstmgofqohs`
+- **Supabase project ref:** `kmjlwaviqqznjagrgkpd`
 - **Región:** Por confirmar desde el proyecto conectado
-- **MCP:** Conectado al proyecto de desarrollo; verificado en modo de lectura el 2026-08-26
+- **MCP:** Pendiente de reconectar al nuevo proyecto de desarrollo; no aplicar migraciones hasta validar la conexión PostgreSQL.
 - **UI/UX Pro Max:** Instalado y verificado; versión `2.15.0`
 - **Propiedad y administración:** La organización Supabase APOLO y el panel CyberSOS están autorizados para `santiagoforeroch@gmail.com`. Son identidades separadas: cuenta del Dashboard y usuario de Supabase Auth, ambas con MFA obligatorio.
 

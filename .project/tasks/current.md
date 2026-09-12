@@ -2,6 +2,8 @@
 
 ## Renovación de CyberSOS como plataforma de ciberdenuncias
 
+- [ ] Conectar y aplicar las migraciones existentes al nuevo proyecto Supabase de desarrollo `kmjlwaviqqznjagrgkpd`; no trasladar datos reales.
+
 - [x] Reparar el arranque local y verificar el envío de reportes con la base de desarrollo.
 - [ ] Configurar el puente WhatsApp local con PostgreSQL/Supabase, secretos privados y una cuenta dedicada para habilitar el QR.
 - [x] Retirar el acceso por código de piloto y permitir el envío público de ciberdenuncias sin cuenta.
@@ -18,7 +20,7 @@
 - [x] Fortalecer la bandeja administrativa: filtros por prioridad, actualización manual y mensajes claros ante errores o casos no encontrados.
 - [x] Garantizar que el acceso local use una base SQLite aislada cuando Supabase no esté disponible, sin cambiar la configuración de despliegue.
 - [x] Añadir gráficas administrativas para evolución, estados y prioridades de los reportes.
-- [ ] Verificar el flujo actualizado en navegador y completar medidas antiabuso antes de usar datos reales.
+- [ ] Verificar el flujo actualizado en navegador antes de usar datos reales.
 
 ## Flujo vertical inicial: reporte ciudadano
 
@@ -66,7 +68,7 @@
 - [ ] Incorporar clasificación Gemini con salida estructurada, trazabilidad, revisión humana y límites de uso.
 - [ ] Crear tablero de métricas: categorías, severidad, tiempos de respuesta y evolución temporal.
 - [ ] Añadir notificaciones institucionales sin incluir información sensible en el correo.
-- [ ] Automatizar retención de 90 días, auditoría y eliminación verificable.
+- [x] Automatizar retención de 90 días, auditoría y eliminación verificable.
 - [ ] Preparar despliegues separados de desarrollo y producción, monitoreo y copias de seguridad.
   - [x] Preparar frontend Vite y FastAPI como servicios de Vercel con el mismo dominio (`/` y `/api`).
   - [x] Migrar la configuración a la sintaxis `services` actual de Vercel y enrutar explícitamente `/api` al backend.

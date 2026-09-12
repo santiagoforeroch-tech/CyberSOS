@@ -48,6 +48,11 @@ def test_citizen_report_and_admin_history(monkeypatch) -> None:
                 files={"evidence": ("falsa.png", b"esto-no-es-una-imagen", "image/png")},
             )
             assert rejected.status_code == 422
+            bot_submission = await client.post(
+                "/api/v1/reports",
+                data={"payload": json.dumps(payload), "website": "https://robot.example"},
+            )
+            assert bot_submission.status_code == 422
             created = await client.post(
                 "/api/v1/reports",
                 data={"payload": json.dumps(payload)},

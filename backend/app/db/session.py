@@ -9,8 +9,19 @@ from app.core.config import settings
 
 @lru_cache
 def get_engine() -> Engine:
-    connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
-    return create_engine(settings.database_url, pool_pre_ping=True, connect_args=connect_args)
+    database_url = settings.database_url
+    # Supabase entrega URLs postgresql://; el proyecto usa psycopg v3.
+    if database_url.startswith("postgresql://"):
+        database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+    if database_url.startswith("sqlite"):
+        connect_args = {"check_same_thread": False}
+    elif ".pooler.supabase.com:6543" in database_url:
+        # El pooler transaccional de Supabase no admite prepared statements.
+        connect_args = {"prepare_threshold": None}
+    else:
+        connect_args = {}
+    return create_engine(database_url, pool_pre_ping=True, connect_args=connect_args)
 
 
 def get_db() -> Generator[Session, None, None]:

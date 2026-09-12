@@ -215,6 +215,7 @@ textarea { resize:vertical; line-height:1.55; }
 .mfa-enrollment { display:grid; gap:12px; padding:16px; border:1px solid var(--line); border-radius:12px; background:var(--soft); }
 .mfa-enrollment img { width:180px; max-width:100%; margin:auto; border-radius:8px; background:white; padding:8px; }
 .mfa-enrollment code { display:block; margin-top:8px; padding:8px; overflow-wrap:anywhere; background:white; border-radius:6px; }
+.bot-trap { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
 .public-header { position:sticky; z-index:30; top:0; background:#fffffff2; backdrop-filter:blur(18px); }
 .public-header nav>a:not(.button) { position:relative; }
 .public-header nav>a:not(.button)::after { content:""; position:absolute; left:0; right:100%; bottom:-8px; height:2px; background:var(--blue); transition:right .2s ease; }

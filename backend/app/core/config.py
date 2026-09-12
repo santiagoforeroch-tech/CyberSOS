@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     retention_days: int = 90
     public_report_rate_limit: int = 5
     public_report_rate_window_seconds: int = 3600
+    cron_secret: str = ""
     auth_provider: str = "local"
     supabase_url: str = ""
     supabase_publishable_key: str = ""
