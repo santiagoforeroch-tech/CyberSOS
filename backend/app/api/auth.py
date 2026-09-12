@@ -30,8 +30,8 @@ class ActivationInput(BaseModel):
 class AdminRegistrationInput(BaseModel):
     full_name: str = Field(min_length=5, max_length=120)
     email: EmailStr
-    password: str = Field(max_length=128)
-    password_confirmation: str = Field(max_length=128)
+    password: str = Field(min_length=6, max_length=128)
+    password_confirmation: str = Field(min_length=6, max_length=128)
     setup_key: str = Field(min_length=8, max_length=64)
 
     @field_validator("full_name")
@@ -145,6 +145,8 @@ def register_admin(payload: AdminRegistrationInput, response: Response) -> dict:
     except HTTPException:
         raise
     except Exception as exc:
+        if "invalid login credentials" in str(exc).casefold():
+            raise HTTPException(422, "La cuenta no pudo iniciar sesión después de crearse. Usa una contraseña de al menos 6 caracteres e inténtalo de nuevo") from exc
         raise HTTPException(502, "No fue posible crear la cuenta administrativa") from exc
 
 
