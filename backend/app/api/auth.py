@@ -30,8 +30,8 @@ class ActivationInput(BaseModel):
 class AdminRegistrationInput(BaseModel):
     full_name: str = Field(min_length=5, max_length=120)
     email: EmailStr
-    password: str = Field(min_length=12, max_length=128)
-    password_confirmation: str = Field(min_length=12, max_length=128)
+    password: str = Field(max_length=128)
+    password_confirmation: str = Field(max_length=128)
     setup_key: str = Field(min_length=8, max_length=64)
 
     @field_validator("full_name")
@@ -46,14 +46,6 @@ class AdminRegistrationInput(BaseModel):
     def validate_password(self):
         if self.password != self.password_confirmation:
             raise ValueError("Las contraseñas no coinciden")
-        requirements = (
-            any(character.islower() for character in self.password),
-            any(character.isupper() for character in self.password),
-            any(character.isdigit() for character in self.password),
-            any(not character.isalnum() for character in self.password),
-        )
-        if not all(requirements):
-            raise ValueError("La contraseña debe incluir mayúscula, minúscula, número y símbolo")
         return self
 
 
@@ -160,8 +152,6 @@ def register_admin(payload: AdminRegistrationInput, response: Response) -> dict:
 def activate(payload: ActivationInput, response: Response) -> dict:
     if settings.auth_provider != "supabase":
         raise HTTPException(404, "La activación solo está disponible con Supabase")
-    if len(payload.password) < 12:
-        raise HTTPException(422, "La contraseña debe tener al menos 12 caracteres")
     try:
         client = auth_client()
         session = client.auth.set_session(payload.access_token, payload.refresh_token)

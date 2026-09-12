@@ -66,6 +66,7 @@ input,textarea,select { width:100%; border:1px solid #cbd7e4; border-radius:10px
 .password-field input { padding-right:54px; }
 .password-field button { position:absolute; top:50%; right:8px; display:grid; width:40px; height:40px; padding:0; place-items:center; border:0; border-radius:8px; color:#685e79; background:transparent; cursor:pointer; transform:translateY(-50%); }
 .password-field button:hover { color:#6d28d9; background:#f0e8ff; }
+.password-help { display:none; }
 .password-field button svg { width:19px; height:19px; }
 textarea { resize:vertical; line-height:1.55; }
 .form-error { padding:12px 14px; margin:16px 0 0; border:1px solid #f1b9b9; border-radius:9px; color:#a32d35; background:#fff2f2; font-size:.84rem; }

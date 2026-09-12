@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-12 (contraseñas abiertas):** Se eliminó del backend la validación de complejidad y longitud mínima para el registro administrativo; también se ocultó la ayuda visual que exigía mayúsculas, minúsculas, números y símbolos. Se conserva únicamente el límite máximo de 128 caracteres y la confirmación de coincidencia.
+
 - **Actualización 2026-09-12 (contraseña fija de activación):** La creación única del administrador ahora valida la variable privada `ADMIN_SETUP_PASSWORD` en lugar de derivar la clave desde `SESSION_SECRET`. Se documentó únicamente el nombre de la variable en `.env.example` y `vercel.env.example`; no se guardó ninguna contraseña real.
 
 - **Actualización 2026-09-12 (acceso local):** Se corrigió `scripts/abrir_cybersos.ps1`: Vite se inicia y ahora también se abre en `http://127.0.0.1:4174/`. Antes el script iniciaba en `127.0.0.1` pero abría `localhost`, que en este equipo rechazaba la conexión y mostraba una pantalla gris de error. Verificación visual directa: la portada CyberSOS cargó correctamente con la paleta violeta y magenta.
