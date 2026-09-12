@@ -103,7 +103,7 @@ def login(payload: LoginInput, response: Response) -> dict:
         signed_in = client.auth.sign_in_with_password({"email": str(payload.email), "password": payload.password})
         if not signed_in.user or not signed_in.session:
             raise HTTPException(401, "Credenciales incorrectas")
-        require_institutional_admin(signed_in.user.email)
+        require_institutional_admin(signed_in.user.email, signed_in.user.app_metadata)
         set_supabase_cookies(response, signed_in.session.access_token, signed_in.session.refresh_token)
         return start_mfa(client, response)
     except HTTPException:
@@ -116,17 +116,16 @@ def login(payload: LoginInput, response: Response) -> dict:
 def register_admin(payload: AdminRegistrationInput, response: Response) -> dict:
     if settings.auth_provider != "supabase":
         raise HTTPException(404, "La activación solo está disponible con Supabase")
-    authorized_email = settings.supabase_admin_email.casefold()
-    valid_email = str(payload.email).casefold() == authorized_email
     valid_key = hmac.compare_digest(payload.setup_key.strip().upper(), expected_admin_setup_key())
-    if not valid_email or not valid_key:
+    if not valid_key:
         raise HTTPException(403, "El correo o la clave de creación no son válidos")
 
     try:
         admin_client = admin_auth_client()
         listed = admin_client.auth.admin.list_users(page=1, per_page=1000)
         users = getattr(listed, "users", listed)
-        existing = next((user for user in users if (user.email or "").casefold() == authorized_email), None)
+        requested_email = str(payload.email).casefold()
+        existing = next((user for user in users if (user.email or "").casefold() == requested_email), None)
         if existing and bool((existing.app_metadata or {}).get("setup_complete")):
             raise HTTPException(409, "La cuenta administrativa ya fue creada; inicia sesión")
 
@@ -148,7 +147,7 @@ def register_admin(payload: AdminRegistrationInput, response: Response) -> dict:
         signed_in = client.auth.sign_in_with_password({"email": str(payload.email), "password": payload.password})
         if not signed_in.user or not signed_in.session:
             raise HTTPException(401, "La cuenta fue creada, pero no fue posible iniciar la sesión")
-        require_institutional_admin(signed_in.user.email)
+        require_institutional_admin(signed_in.user.email, signed_in.user.app_metadata)
         set_supabase_cookies(response, signed_in.session.access_token, signed_in.session.refresh_token)
         return start_mfa(client, response)
     except HTTPException:
@@ -168,9 +167,9 @@ def activate(payload: ActivationInput, response: Response) -> dict:
         session = client.auth.set_session(payload.access_token, payload.refresh_token)
         if not session.user or not session.session:
             raise HTTPException(401, "La invitación no es válida o ya venció")
-        require_institutional_admin(session.user.email)
+        require_institutional_admin(session.user.email, session.user.app_metadata)
         updated = client.auth.update_user({"password": payload.password})
-        require_institutional_admin(updated.user.email)
+        require_institutional_admin(updated.user.email, updated.user.app_metadata)
         current_session = client.auth.get_session()
         if not current_session:
             raise HTTPException(401, "No fue posible crear la sesión")
@@ -205,7 +204,7 @@ def mfa(
         client = auth_client()
         client.auth.set_session(sb_access_token, sb_refresh_token)
         verified = client.auth.mfa.verify({"factor_id": mfa_factor_id, "challenge_id": mfa_challenge_id, "code": payload.code})
-        require_institutional_admin(verified.user.email)
+        require_institutional_admin(verified.user.email, verified.user.app_metadata)
         set_supabase_cookies(response, verified.access_token, verified.refresh_token)
         response.delete_cookie("mfa_factor_id", path="/")
         response.delete_cookie("mfa_challenge_id", path="/")

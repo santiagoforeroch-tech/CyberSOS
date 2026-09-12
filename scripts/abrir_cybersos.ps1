@@ -116,10 +116,10 @@ try {
     }
 
     if (-not $SkipBrowser) {
-        Start-Process "http://localhost:$frontendPort/"
+        Start-Process "http://127.0.0.1:$frontendPort/"
     }
 
-    Write-Host "CyberSOS está disponible en http://localhost:$frontendPort/"
+    Write-Host "CyberSOS está disponible en http://127.0.0.1:$frontendPort/"
 } finally {
     if ($null -eq $previousDatabaseUrl) { Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue } else { $env:DATABASE_URL = $previousDatabaseUrl }
     if ($null -eq $previousViteApiUrl) { Remove-Item Env:VITE_API_URL -ErrorAction SilentlyContinue } else { $env:VITE_API_URL = $previousViteApiUrl }

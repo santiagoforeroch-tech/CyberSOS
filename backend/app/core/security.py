@@ -15,10 +15,9 @@ def sign_token(purpose: str, lifetime: int) -> str:
 
 
 def expected_admin_setup_key() -> str:
-    if not settings.session_secret:
+    if not settings.admin_setup_password:
         raise HTTPException(503, "La activación administrativa no está configurada")
-    digest = hmac.new(settings.session_secret.encode(), b"cybersos-admin-setup", hashlib.sha256).hexdigest().upper()
-    return f"CS-{digest[:6]}-{digest[6:12]}"
+    return settings.admin_setup_password
 
 
 def valid_token(token: str | None, purpose: str) -> bool:
@@ -48,7 +47,7 @@ def require_admin(
     try:
         user_response = auth_client().auth.get_user(sb_access_token)
         user = user_response.user
-        require_institutional_admin(user.email)
+        require_institutional_admin(user.email, user.app_metadata)
         if verified_aal(sb_access_token) != "aal2":
             raise HTTPException(403, "Completa la verificación MFA")
         return user.id

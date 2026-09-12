@@ -1,5 +1,9 @@
 # Último handoff
 
+- **Actualización 2026-09-12 (contraseña fija de activación):** La creación única del administrador ahora valida la variable privada `ADMIN_SETUP_PASSWORD` en lugar de derivar la clave desde `SESSION_SECRET`. Se documentó únicamente el nombre de la variable en `.env.example` y `vercel.env.example`; no se guardó ninguna contraseña real.
+
+- **Actualización 2026-09-12 (acceso local):** Se corrigió `scripts/abrir_cybersos.ps1`: Vite se inicia y ahora también se abre en `http://127.0.0.1:4174/`. Antes el script iniciaba en `127.0.0.1` pero abría `localhost`, que en este equipo rechazaba la conexión y mostraba una pantalla gris de error. Verificación visual directa: la portada CyberSOS cargó correctamente con la paleta violeta y magenta.
+
 - **Actualización 2026-09-12 (configuración Vercel):** El despliegue de producción `cybersos-web` está `Ready`, procede de `master` (commit `b473f1c`) y la URL pública responde con salud PostgreSQL. Vercel registra `SUPABASE_URL`, claves Supabase, `DATABASE_URL`, `SESSION_SECRET`, `FRONTEND_ORIGIN`, `APP_ENV`, `AUTH_PROVIDER`, `COOKIE_SECURE` y correo administrador para producción/vista previa. `CRON_SECRET` no está configurado: la búsqueda de esa variable no devolvió resultados, por lo que la tarea diaria de retención responderá `503` y no debe considerarse activa. Los valores secretos no se visualizaron; el panel no permite confirmar desde la interfaz el `project_ref` de `SUPABASE_URL` sin revelar el valor.
 
 - **Actualización 2026-09-12 (verificación remota Vercel/Supabase):** La URL pública `https://cybersos-web.vercel.app/` y `GET /api/health` respondieron `200`. La API desplegada devolvió `{"status":"ok","database":"postgresql"}`, confirmando que Vercel no usa SQLite local. Una consulta de solo lectura `SELECT 1` desde el backend configurado también respondió correctamente contra PostgreSQL de Supabase. Aún falta aplicar las migraciones al nuevo proyecto de desarrollo y verificar el flujo completo de formulario y administración en la URL pública.
@@ -70,5 +74,7 @@
 - **Siguiente paso:** Abrir el panel, completar el enrolamiento TOTP y probar el acceso real; después, incorporar análisis antivirus.
 
 No guardar secretos en este archivo.
+
+- **Actualización 2026-09-12 (MCP con token privado):** Se configuró el servidor MCP del proyecto con alcance exclusivo a `kmjlwaviqqznjagrgkpd` y la referencia a la variable de usuario `SUPABASE_ACCESS_TOKEN`. El token no está en el repositorio, archivos de entorno ni este registro. Falta que Codex recargue la configuración y comprobar la disponibilidad de las herramientas antes de aplicar las migraciones existentes.
 
 - **Actualización 2026-09-12 (Vercel):** Se creó `CRON_SECRET` como variable privada de **Production** en Vercel y se generó un nuevo despliegue de producción. El despliegue `43sto5SgBKtTPKs23sKqrd6o9VbY` terminó en estado **Ready** y está asignado a `cybersos-web.vercel.app`. No se ejecutó manualmente la tarea de retención: esa operación elimina únicamente datos ficticios vencidos y debe ser invocada por el programador autenticado. Queda pendiente publicar el código local verificado (incluye la protección de dicha tarea) y aplicar las migraciones al nuevo Supabase mediante MCP.

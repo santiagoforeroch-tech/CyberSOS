@@ -22,8 +22,8 @@ def admin_auth_client() -> Client:
     )
 
 
-def require_institutional_admin(user_email: str | None) -> None:
-    if not user_email or user_email.casefold() != settings.supabase_admin_email.casefold():
+def require_institutional_admin(user_email: str | None, app_metadata: dict | None = None) -> None:
+    if not user_email or not app_metadata or app_metadata.get("role") != "admin" or not app_metadata.get("setup_complete"):
         raise HTTPException(403, "Esta cuenta no tiene autorización administrativa")
 
 

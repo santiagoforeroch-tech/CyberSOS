@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     whatsapp_admin_local: bool = True
     whatsapp_max_media_mb: int = 20
     session_secret: str = ""
+    admin_setup_password: str = ""
     cookie_secure: bool = False
     retention_days: int = 90
     public_report_rate_limit: int = 5
