@@ -108,7 +108,9 @@ def login(payload: LoginInput, response: Response) -> dict:
 def register_admin(payload: AdminRegistrationInput, response: Response) -> dict:
     if settings.auth_provider != "supabase":
         raise HTTPException(404, "La activación solo está disponible con Supabase")
-    valid_key = hmac.compare_digest(payload.setup_key.strip().upper(), expected_admin_setup_key())
+    valid_key = hmac.compare_digest(
+        payload.setup_key.strip().casefold(), expected_admin_setup_key().strip().casefold()
+    )
     if not valid_key:
         raise HTTPException(403, "El correo o la clave de creación no son válidos")
 
