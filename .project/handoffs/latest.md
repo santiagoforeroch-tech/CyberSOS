@@ -1,5 +1,9 @@
 # Último handoff
 
+- **Actualización 2026-09-12 (OTP por correo):** Se reemplazó el flujo TOTP con QR por códigos OTP enviados al correo registrado mediante Supabase Auth. Login, registro y activación solicitan el código por email; la sesión administrativa valida el rol `admin` y `setup_complete` sin exigir `aal2` de TOTP. Frontend lint correcto. Falta desplegar y probar el envío real con SMTP configurado.
+
+- **Actualización 2026-09-12 (migraciones Supabase):** Se aplicaron correctamente las cinco migraciones existentes al proyecto de desarrollo `kmjlwaviqqznjagrgkpd`: núcleo CyberSOS, índices de evidencias y relaciones, central WhatsApp y auditoría de retención. Verificación: migraciones registradas, tablas principales creadas, conexión `public.whatsapp_connections` inicializada y `private.reports` con cero registros. El asesor reporta un aviso de RLS para tablas del esquema privado; la migración ya revoca `anon` y `authenticated`, por lo que no se aplicó una corrección automática que podría bloquear al backend.
+
 - **Actualización 2026-09-12 (contraseñas abiertas):** Se eliminó del backend la validación de complejidad y longitud mínima para el registro administrativo; también se ocultó la ayuda visual que exigía mayúsculas, minúsculas, números y símbolos. Se conserva únicamente el límite máximo de 128 caracteres y la confirmación de coincidencia.
 
 - **Actualización 2026-09-12 (contraseña fija de activación):** La creación única del administrador ahora valida la variable privada `ADMIN_SETUP_PASSWORD` en lugar de derivar la clave desde `SESSION_SECRET`. Se documentó únicamente el nombre de la variable en `.env.example` y `vercel.env.example`; no se guardó ninguna contraseña real.

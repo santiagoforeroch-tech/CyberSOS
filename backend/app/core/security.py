@@ -42,14 +42,12 @@ def require_admin(
     if not sb_access_token:
         raise HTTPException(401, "Inicia sesión con la cuenta institucional")
 
-    from app.services.supabase_auth import auth_client, require_institutional_admin, verified_aal
+    from app.services.supabase_auth import auth_client, require_institutional_admin
 
     try:
         user_response = auth_client().auth.get_user(sb_access_token)
         user = user_response.user
         require_institutional_admin(user.email, user.app_metadata)
-        if verified_aal(sb_access_token) != "aal2":
-            raise HTTPException(403, "Completa la verificación MFA")
         return user.id
     except HTTPException:
         raise

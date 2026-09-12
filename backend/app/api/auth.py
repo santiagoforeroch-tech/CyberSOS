@@ -55,20 +55,12 @@ def set_supabase_cookies(response: Response, access_token: str, refresh_token: s
     response.set_cookie("sb_refresh_token", refresh_token, max_age=60 * 60 * 24 * 30, **options)
 
 
-def start_mfa(client, response: Response) -> dict:
-    verified = next((factor for factor in client.auth.mfa.list_factors().totp if factor.status == "verified"), None)
-    enrollment = None
-    factor_id = verified.id if verified else ""
-    if not verified:
-        enrolled = client.auth.mfa.enroll({"factor_type": "totp", "friendly_name": "CyberSOS administrador"})
-        factor_id = enrolled.id
-        enrollment = {"qr_code": enrolled.totp.qr_code, "secret": enrolled.totp.secret}
-    challenge = client.auth.mfa.challenge({"factor_id": factor_id})
+def start_mfa(client, response: Response, email: str) -> dict:
+    client.auth.sign_in_with_otp({"email": email, "options": {"should_create_user": False}})
     cookie_options = {"httponly": True, "secure": settings.cookie_secure, "samesite": "strict", "max_age": 300, "path": "/"}
     response.set_cookie("mfa_pending", sign_token("mfa-pending", 300), **cookie_options)
-    response.set_cookie("mfa_factor_id", factor_id, **cookie_options)
-    response.set_cookie("mfa_challenge_id", challenge.id, **cookie_options)
-    return {"mfa_required": True, "enrollment_required": enrollment is not None, "enrollment": enrollment}
+    response.set_cookie("mfa_email", email, **cookie_options)
+    return {"mfa_required": True, "email_verification": True, "email": email}
 
 
 def login_error(exc: Exception) -> HTTPException:
@@ -97,7 +89,7 @@ def login(payload: LoginInput, response: Response) -> dict:
             raise HTTPException(401, "Credenciales incorrectas")
         require_institutional_admin(signed_in.user.email, signed_in.user.app_metadata)
         set_supabase_cookies(response, signed_in.session.access_token, signed_in.session.refresh_token)
-        return start_mfa(client, response)
+        return start_mfa(client, response, str(signed_in.user.email))
     except HTTPException:
         raise
     except Exception as exc:
@@ -143,7 +135,7 @@ def register_admin(payload: AdminRegistrationInput, response: Response) -> dict:
             raise HTTPException(401, "La cuenta fue creada, pero no fue posible iniciar la sesión")
         require_institutional_admin(signed_in.user.email, signed_in.user.app_metadata)
         set_supabase_cookies(response, signed_in.session.access_token, signed_in.session.refresh_token)
-        return start_mfa(client, response)
+        return start_mfa(client, response, str(signed_in.user.email))
     except HTTPException:
         raise
     except Exception as exc:
@@ -168,7 +160,7 @@ def activate(payload: ActivationInput, response: Response) -> dict:
         if not current_session:
             raise HTTPException(401, "No fue posible crear la sesión")
         set_supabase_cookies(response, current_session.access_token, current_session.refresh_token)
-        return start_mfa(client, response)
+        return start_mfa(client, response, str(current_session.user.email))
     except HTTPException:
         raise
     except Exception as exc:
@@ -181,8 +173,7 @@ def mfa(
     response: Response,
     sb_access_token: str | None = Cookie(default=None),
     sb_refresh_token: str | None = Cookie(default=None),
-    mfa_factor_id: str | None = Cookie(default=None),
-    mfa_challenge_id: str | None = Cookie(default=None),
+    mfa_email: str | None = Cookie(default=None),
     _: None = Depends(require_mfa_pending),
 ) -> dict:
     if settings.auth_provider == "local":
@@ -192,16 +183,16 @@ def mfa(
         response.delete_cookie("mfa_pending", secure=settings.cookie_secure, samesite="strict")
         return {"authenticated": True, "aal": "aal2"}
 
-    if not all((sb_access_token, sb_refresh_token, mfa_factor_id, mfa_challenge_id)):
+    if not mfa_email:
         raise HTTPException(401, "La verificación MFA expiró; inicia sesión nuevamente")
     try:
         client = auth_client()
-        client.auth.set_session(sb_access_token, sb_refresh_token)
-        verified = client.auth.mfa.verify({"factor_id": mfa_factor_id, "challenge_id": mfa_challenge_id, "code": payload.code})
+        verified = client.auth.verify_otp({"email": mfa_email, "token": payload.code, "type": "email"})
+        if not verified.user or not verified.session:
+            raise HTTPException(401, "El código de correo no es válido o ya venció")
         require_institutional_admin(verified.user.email, verified.user.app_metadata)
         set_supabase_cookies(response, verified.access_token, verified.refresh_token)
-        response.delete_cookie("mfa_factor_id", path="/")
-        response.delete_cookie("mfa_challenge_id", path="/")
+        response.delete_cookie("mfa_email", path="/")
         return {"authenticated": True, "aal": "aal2"}
     except HTTPException:
         raise
@@ -211,5 +202,5 @@ def mfa(
 
 @router.post("/logout", status_code=204)
 def logout(response: Response) -> None:
-    for name in ("admin_session", "mfa_pending", "sb_access_token", "sb_refresh_token", "mfa_factor_id", "mfa_challenge_id"):
+    for name in ("admin_session", "mfa_pending", "sb_access_token", "sb_refresh_token", "mfa_email"):
         response.delete_cookie(name, secure=settings.cookie_secure, samesite="strict", path="/")
