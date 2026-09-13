@@ -1,4 +1,5 @@
 import hashlib
+import socket
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
@@ -27,6 +28,25 @@ class PreparedEvidence:
     sha256: str
 
 
+def scan_with_clamav(content: bytes) -> None:
+    """Scan bytes through clamd's INSTREAM protocol and fail closed."""
+    try:
+        with socket.create_connection(
+            (settings.clamav_host, settings.clamav_port),
+            timeout=settings.clamav_timeout_seconds,
+        ) as connection:
+            connection.sendall(b"zINSTREAM\0")
+            for start in range(0, len(content), 1024 * 1024):
+                chunk = content[start:start + 1024 * 1024]
+                connection.sendall(len(chunk).to_bytes(4, "big") + chunk)
+            connection.sendall((0).to_bytes(4, "big"))
+            result = connection.recv(4096).decode("utf-8", errors="replace").strip()
+    except OSError as error:
+        raise HTTPException(503, "El antivirus no está disponible; intenta nuevamente más tarde") from error
+    if not result.endswith("OK"):
+        raise HTTPException(422, "La evidencia fue rechazada por el análisis antivirus")
+
+
 def storage_client() -> Client:
     if not settings.supabase_url or not settings.supabase_secret_key:
         raise HTTPException(503, "El almacenamiento seguro todavía no está configurado")
@@ -49,6 +69,8 @@ async def prepare_evidence(files: list[UploadFile]) -> list[PreparedEvidence]:
             valid_signature = valid_signature and len(content) >= 12 and content[8:12] == b"WEBP"
         if not valid_signature:
             raise HTTPException(422, "El contenido del archivo no coincide con su tipo de imagen")
+        if settings.antivirus_enabled:
+            scan_with_clamav(content)
         safe_name = Path(file.filename or "evidencia").name[:255]
         prepared.append(PreparedEvidence(safe_name, mime_type, content, hashlib.sha256(content).hexdigest()))
     return prepared

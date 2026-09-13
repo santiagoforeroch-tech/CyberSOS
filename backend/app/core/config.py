@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     notification_from: str = ""
     notification_admin_email: str = ""
+    antivirus_enabled: bool = False
+    clamav_host: str = "127.0.0.1"
+    clamav_port: int = 3310
+    clamav_timeout_seconds: int = 15
 
     model_config = SettingsConfigDict(
         env_file=PROJECT_ROOT / ".env",

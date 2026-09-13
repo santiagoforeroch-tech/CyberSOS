@@ -64,7 +64,7 @@
 ## Potenciadores priorizados
 
 - [x] Añadir almacenamiento privado con tipos permitidos, tamaño máximo y enlaces temporales.
-- [ ] Incorporar análisis antivirus antes de habilitar archivos de ciudadanos reales.
+- [x] Incorporar integración configurable con ClamAV antes de habilitar archivos de ciudadanos reales; queda pendiente desplegar el escáner privado.
 - [ ] Incorporar clasificación Gemini con salida estructurada, trazabilidad, revisión humana y límites de uso.
 - [ ] Crear tablero de métricas: categorías, severidad, tiempos de respuesta y evolución temporal.
 - [ ] Añadir notificaciones institucionales sin incluir información sensible en el correo.
