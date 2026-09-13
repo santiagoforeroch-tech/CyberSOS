@@ -87,3 +87,4 @@
 - [x] Integrar el logo proporcionado por el estudiante en la marca reutilizada de portada, pie, acceso administrativo y panel.
 - [x] Mostrar el nombre CyberSOS debajo del símbolo con adaptación responsive.
 - [ ] Verificar el flujo actualizado en navegador y corregir el bloqueo local de Vitest/build causado por permisos de esbuild en OneDrive.
+- [x] Crear Centro de protección público con guía rápida, checklist, recursos oficiales y acceso directo al reporte.

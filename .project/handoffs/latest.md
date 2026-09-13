@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-13 (Centro de protección):** Se añadió la ruta pública `/proteccion` con recomendaciones accionables para mensajes sospechosos, cuentas y dispositivos; checklist desplegable; enlaces oficiales de Seguridad de Windows e INCIBE; y aviso de alcance para no presentarlo como sustituto de antivirus o autoridades. Se actualizó la navegación pública y las 6 pruebas frontend pasaron en `C:\dev\CyberSOS-Limpio`.
+
 - **Actualización 2026-09-13 (antivirus y notificaciones):** Se añadió notificación SMTP segura, desactivada por defecto, y análisis opcional mediante ClamAV `INSTREAM`. Cuando `ANTIVIRUS_ENABLED=true`, una evidencia no se guarda si ClamAV no responde o detecta una amenaza. Las 10 pruebas de backend pasaron en `C:\dev\CyberSOS-Limpio`; falta desplegar/configurar el escáner privado y el SMTP de Hostinger.
 
 - **Actualización 2026-09-13 (logo):** Se incorporó el archivo proporcionado por el estudiante como `frontend/src/assets/cybersos-logo.jpeg`. El componente de marca ahora lo reutiliza en portada, pie, acceso administrativo y panel, mostrando “CyberSOS” debajo del símbolo y tamaños adaptables. ESLint terminó correctamente. Vitest y build siguen bloqueados por el permiso de lectura de esbuild sobre el directorio superior de OneDrive; no se observó un error de código en esta modificación.
