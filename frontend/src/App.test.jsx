@@ -10,7 +10,7 @@ vi.mock('./api/client.js', () => ({
 }))
 
 describe('App', () => {
-  afterEach(() => { cleanup(); window.history.pushState({}, '', '/') })
+    afterEach(() => { cleanup(); window.location.hash = '' })
 
   it('muestra el título del proyecto', () => {
     render(<App />)
@@ -19,7 +19,7 @@ describe('App', () => {
   })
 
   it('muestra la bandeja administrativa', async () => {
-    window.history.pushState({}, '', '/admin')
+    window.location.hash = '#/admin'
     render(<App />)
 
     expect(await screen.findByRole('heading', { name: 'Reportes ciudadanos' })).toBeInTheDocument()
@@ -30,7 +30,7 @@ describe('App', () => {
   })
 
   it('explica las categorías del formulario en lenguaje sencillo', async () => {
-    window.history.pushState({}, '', '/reportar')
+    window.location.hash = '#/reportar'
     render(<App />)
 
     expect(await screen.findByText('Mensajes o páginas falsas que se hacen pasar por un banco, empresa o persona para pedir datos.')).toBeInTheDocument()

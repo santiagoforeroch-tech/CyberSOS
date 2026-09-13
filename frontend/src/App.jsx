@@ -5,7 +5,7 @@ const WhatsAppPanel = import.meta.env.DEV
   : null
 
 import { Activity, ArrowLeft, ArrowRight, BarChart3, CheckCircle2, Clock3, Download, ExternalLink, Eye, EyeOff, FileText, Image, KeyRound, LockKeyhole, LogIn, MessageSquareText, RefreshCw, Search, ShieldAlert, ShieldCheck, Smartphone, UserPlus } from 'lucide-react'
-import { BrowserRouter, Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { HashRouter, Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { apiRequest } from './api/client.js'
 import providedLogo from './assets/cybersos-logo-transparent.png'
@@ -144,4 +144,4 @@ function Detail(){
     </div></AdminLayout>
 }
 
-export default function App(){ return <BrowserRouter><Routes><Route path="/" element={<Home/>}/><Route path="/proteccion" element={<ProtectionCenter/>}/><Route path="/reportar" element={<Report/>}/><Route path="/reporte/confirmacion" element={<Confirmation/>}/><Route path="/admin/login" element={<AdminLogin/>}/><Route path="/admin/crear-cuenta" element={<AdminRegistration/>}/><Route path="/admin/activar" element={<AdminActivation/>}/><Route path="/admin/mfa" element={<AdminMfa/>}/><Route path="/admin" element={<Dashboard/>}/><Route path="/admin/whatsapp" element={<AdminWhatsApp/>}/><Route path="/admin/reportes/:id" element={<Detail/>}/><Route path="*" element={<Navigate to="/"/>}/></Routes></BrowserRouter> }
+export default function App(){ return <HashRouter><Routes><Route path="/" element={<Home/>}/><Route path="/proteccion" element={<ProtectionCenter/>}/><Route path="/reportar" element={<Report/>}/><Route path="/reporte/confirmacion" element={<Confirmation/>}/><Route path="/admin/login" element={<AdminLogin/>}/><Route path="/admin/crear-cuenta" element={<AdminRegistration/>}/><Route path="/admin/activar" element={<AdminActivation/>}/><Route path="/admin/mfa" element={<AdminMfa/>}/><Route path="/admin" element={<Dashboard/>}/><Route path="/admin/whatsapp" element={<AdminWhatsApp/>}/><Route path="/admin/reportes/:id" element={<Detail/>}/><Route path="*" element={<Navigate to="/"/>}/></Routes></HashRouter> }
