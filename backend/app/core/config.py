@@ -30,6 +30,13 @@ class Settings(BaseSettings):
     local_admin_email: str = "admin@cybersos.example"
     local_admin_password: str = ""
     local_mfa_code: str = ""
+    notifications_enabled: bool = False
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    notification_from: str = ""
+    notification_admin_email: str = ""
 
     model_config = SettingsConfigDict(
         env_file=PROJECT_ROOT / ".env",

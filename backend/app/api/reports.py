@@ -11,6 +11,7 @@ from app.models import CaseHistory, Evidence
 from app.schemas.reports import ReportCreate
 from app.services.evidence import prepare_evidence, remove_evidence, upload_evidence
 from app.services.reports import create_report
+from app.services.notifications import notify_report_received
 
 router = APIRouter(prefix="/v1/reports", tags=["reports"])
 
@@ -48,4 +49,10 @@ async def submit(request: Request, payload: str = Form(), website: str = Form(de
             db.rollback()
             remove_evidence([record["storage_key"] for record in records])
             raise
+    if settings.notifications_enabled:
+        try:
+            notify_report_received(report.case_number)
+        except Exception:
+            # El reporte ya está guardado; una falla de correo no debe duplicar ni perder el caso.
+            pass
     return {"case_number": report.case_number, "evidence_count": len(prepared), "message": "Tu reporte fue recibido correctamente"}
