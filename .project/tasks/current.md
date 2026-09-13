@@ -2,7 +2,7 @@
 
 ## Renovación de CyberSOS como plataforma de ciberdenuncias
 
-- [ ] Conectar y aplicar las migraciones existentes al nuevo proyecto Supabase de desarrollo `kmjlwaviqqznjagrgkpd`; no trasladar datos reales.
+- [x] Conectar y aplicar las migraciones existentes al nuevo proyecto Supabase de desarrollo `kmjlwaviqqznjagrgkpd`; no trasladar datos reales.
 
 - [x] Reparar el arranque local y verificar el envío de reportes con la base de desarrollo.
 - [ ] Configurar el puente WhatsApp local con PostgreSQL/Supabase, secretos privados y una cuenta dedicada para habilitar el QR.
@@ -81,3 +81,9 @@
 - [ ] Aprobar el diseño de seguimiento ciudadano con token revocable, segunda verificación y QR para WhatsApp.
 - [ ] Aprobar el alcance del asistente ciudadano general y del asistente administrativo contextual.
 - [ ] Definir qué actualizaciones del caso son públicas y cuáles permanecen internas.
+
+## Identidad visual y cierre de organización
+
+- [x] Integrar el logo proporcionado por el estudiante en la marca reutilizada de portada, pie, acceso administrativo y panel.
+- [x] Mostrar el nombre CyberSOS debajo del símbolo con adaptación responsive.
+- [ ] Verificar el flujo actualizado en navegador y corregir el bloqueo local de Vitest/build causado por permisos de esbuild en OneDrive.

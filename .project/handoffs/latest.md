@@ -1,5 +1,8 @@
 # Último handoff
 
+- **Actualización 2026-09-13 (logo):** Se incorporó el archivo proporcionado por el estudiante como `frontend/src/assets/cybersos-logo.jpeg`. El componente de marca ahora lo reutiliza en portada, pie, acceso administrativo y panel, mostrando “CyberSOS” debajo del símbolo y tamaños adaptables. ESLint terminó correctamente. Vitest y build siguen bloqueados por el permiso de lectura de esbuild sobre el directorio superior de OneDrive; no se observó un error de código en esta modificación.
+- **Actualización 2026-09-13 (consistencia de registro):** Se retiró del formulario de creación administrativa la ayuda antigua que exigía mayúsculas, minúsculas, números y símbolos, manteniendo la interfaz alineada con la validación vigente del backend.
+
 - **Actualización 2026-09-12 (OTP por correo):** Se reemplazó el flujo TOTP con QR por códigos OTP enviados al correo registrado mediante Supabase Auth. Login, registro y activación solicitan el código por email; la sesión administrativa valida el rol `admin` y `setup_complete` sin exigir `aal2` de TOTP. Frontend lint correcto. Falta desplegar y probar el envío real con SMTP configurado.
 
 - **Actualización 2026-09-12 (migraciones Supabase):** Se aplicaron correctamente las cinco migraciones existentes al proyecto de desarrollo `kmjlwaviqqznjagrgkpd`: núcleo CyberSOS, índices de evidencias y relaciones, central WhatsApp y auditoría de retención. Verificación: migraciones registradas, tablas principales creadas, conexión `public.whatsapp_connections` inicializada y `private.reports` con cero registros. El asesor reporta un aviso de RLS para tablas del esquema privado; la migración ya revoca `anon` y `authenticated`, por lo que no se aplicó una corrección automática que podría bloquear al backend.

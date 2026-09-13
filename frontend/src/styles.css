@@ -13,6 +13,9 @@ h1 { letter-spacing: -.045em; }
 .eyebrow { margin-bottom: 10px; color: #0b80a2; font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 1.18rem; font-weight: 800; }
 .brand-mark { display:block; flex:none; width:38px; height:38px; }
+.brand-lockup { flex-direction:column; align-items:center; gap:3px; line-height:1; }
+.brand-lockup .brand-mark { width:48px; height:48px; object-fit:cover; border-radius:50%; }
+.brand-lockup span { font-size:.78rem; letter-spacing:.08em; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 48px; padding: 0 22px; border: 1px solid var(--blue); border-radius: 11px; color: white; background: linear-gradient(135deg,var(--blue),#be185d); box-shadow: 0 10px 25px #6d28d92b; font-weight: 750; cursor: pointer; }
 .button:hover { transform: translateY(-1px); filter: brightness(1.04); }
 .button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
@@ -157,6 +160,8 @@ textarea { resize:vertical; line-height:1.55; }
 .admin-shell { min-height:100vh; display:grid; grid-template-columns:245px 1fr; background:#f3f6fa; }
 .admin-shell aside { position:sticky; top:0; height:100vh; display:flex; flex-direction:column; padding:28px 20px; color:#d7e7f2; background:linear-gradient(180deg,#06182e,#08243c); }
 .admin-shell aside .brand { margin:0 10px 44px; color:white; }
+.admin-shell aside .brand-lockup .brand-mark { width:58px; height:58px; }
+.admin-shell aside .brand-lockup span { font-size:.72rem; }
 .admin-shell aside nav { display:flex; flex-direction:column; gap:8px; }
 .admin-shell aside nav a { display:flex; align-items:center; gap:12px; padding:12px; border-radius:9px; color:#aebfce; font-size:.86rem; }
 .admin-shell aside nav a:hover { color:white; background:#ffffff12; }
