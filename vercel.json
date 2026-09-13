@@ -1,28 +1,15 @@
 {
   "services": {
     "frontend": {
-      "root": "frontend"
+      "entrypoint": "frontend",
+      "routePrefix": "/"
     },
     "backend": {
-      "root": "backend",
-      "entrypoint": "main:app",
+      "entrypoint": "backend/main.py",
+      "routePrefix": "/api",
       "framework": "fastapi"
     }
   },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": {
-        "service": "backend"
-      }
-    },
-    {
-      "source": "/(.*)",
-      "destination": {
-        "service": "frontend"
-      }
-    }
-  ],
   "crons": [
     {
       "path": "/api/internal/retention/run",
