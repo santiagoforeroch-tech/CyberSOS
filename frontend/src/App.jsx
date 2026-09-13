@@ -8,7 +8,7 @@ import { Activity, ArrowLeft, ArrowRight, BarChart3, CheckCircle2, Clock3, Downl
 import { BrowserRouter, Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { apiRequest } from './api/client.js'
-import providedLogo from './assets/cybersos-logo.jpeg'
+import providedLogo from './assets/cybersos-logo-transparent.png'
 import adminLoginIllustration from './assets/admin-login-illustration.png'
 
 const categories = [
