@@ -25,7 +25,7 @@ const categories = [
 const blank = { category:'', description:'', occurred_at:'', occurred_at_is_approximate:false, channel:'', related_information:{}, reporter_name:'', contact_type:'email', contact_value:'' }
 
 function Brand(){ return <Link className="brand brand-lockup" to="/"><img className="brand-mark" src={providedLogo} width="48" height="48" alt="Logo de CyberSOS"/><span>CyberSOS</span></Link> }
-function Layout({children}){ return <div className="public-shell"><a className="skip-link" href="#contenido">Saltar al contenido</a><header className="public-header"><Brand/><nav><Link to="/#como-funciona">Cómo funciona</Link><Link className="protection-nav-link" to="/proteccion"><ShieldCheck size={16} aria-hidden="true"/>Protección</Link><Link className="button button-small" to="/reportar">Reportar ahora</Link></nav></header>{children}<footer><Brand/><span>Un internet más seguro empieza contigo</span><Link to="/admin/login">Acceso administrativo</Link></footer></div> }
+function Layout({children}){ return <div className="public-shell"><a className="skip-link" href="#contenido">Saltar al contenido</a><header className="public-header"><Brand/><nav><Link to="/#como-funciona">Cómo funciona</Link><Link className="protection-nav-link" to="/proteccion"><ShieldCheck size={16} aria-hidden="true"/>Protección</Link><Link className="public-admin-link" to="/admin/login">Administrador</Link><Link className="button button-small" to="/reportar">Reportar ahora</Link></nav></header>{children}<footer><Brand/><span>Un internet más seguro empieza contigo</span><Link to="/admin/login">Acceso administrativo</Link></footer></div> }
 
 function Home(){
   const steps=[
