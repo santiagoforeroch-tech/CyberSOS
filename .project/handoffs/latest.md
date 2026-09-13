@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-13 (Centro de protección ampliado):** `/proteccion` ahora incluye modo de riesgo inmediato, test local de tres preguntas con progreso, cinco guías por tipo de incidente, descarga de checklist, compartir/copia de enlace, preguntas frecuentes y enlaces a reportar. Frontend verificado con ESLint y 6 pruebas aprobadas.
+
 - **Actualización 2026-09-13 (derivación oficial Colombia):** La confirmación de cada reporte ahora orienta explícitamente al ciudadano hacia CAI Virtual y ADenunciar para la denuncia formal, aclarando que CyberSOS es complementario y no un canal oficial. Se añadieron enlaces externos seguros y se verificó el frontend con 6 pruebas aprobadas.
 
 - **Actualización 2026-09-13 (Centro de protección):** Se añadió la ruta pública `/proteccion` con recomendaciones accionables para mensajes sospechosos, cuentas y dispositivos; checklist desplegable; enlaces oficiales de Seguridad de Windows e INCIBE; y aviso de alcance para no presentarlo como sustituto de antivirus o autoridades. Se actualizó la navegación pública y las 6 pruebas frontend pasaron en `C:\dev\CyberSOS-Limpio`.

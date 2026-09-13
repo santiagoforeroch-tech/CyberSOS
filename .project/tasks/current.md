@@ -88,3 +88,4 @@
 - [x] Mostrar el nombre CyberSOS debajo del símbolo con adaptación responsive.
 - [ ] Verificar el flujo actualizado en navegador y corregir el bloqueo local de Vitest/build causado por permisos de esbuild en OneDrive.
 - [x] Crear Centro de protección público con guía rápida, checklist, recursos oficiales y acceso directo al reporte.
+- [x] Añadir botón de riesgo inmediato, test de seguridad, guías por incidente, checklist descargable, compartir, preguntas frecuentes e indicador de progreso.
