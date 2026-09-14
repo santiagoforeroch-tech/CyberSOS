@@ -15,14 +15,14 @@ describe('App', () => {
   it('muestra el título del proyecto', () => {
     render(<App />)
 
-    expect(screen.getByRole('heading', { name: 'Denuncia una ciberestafa.' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /Hay problemas por ahí\.? Actúa a tiempo\./i })).toBeInTheDocument()
   })
 
   it('muestra la bandeja administrativa', async () => {
     window.location.hash = '#/admin'
     render(<App />)
 
-    expect(await screen.findByRole('heading', { name: 'Reportes ciudadanos' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Hola, Administrador' })).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Caso, persona o categoría')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filtrar por prioridad' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Actualizar' })).toBeInTheDocument()
