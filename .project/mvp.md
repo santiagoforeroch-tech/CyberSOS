@@ -22,6 +22,7 @@ Ofrecer el recorrido reporte → número de caso → gestión administrativa →
 - Formulario guiado, evidencias privadas e identificador `CS-AAAA-XXXXXX`.
 - Panel administrativo protegido con MFA, actualización automática, filtros, detalle, observaciones, historial y estadísticas básicas.
 - Preparación de webhook de WhatsApp.
+- Asistente conversacional con IA para orientar al ciudadano, organizar el relato y preparar un reporte sujeto a confirmación.
 - Retención de 90 días.
 
 ## Fuera del MVP
@@ -29,7 +30,7 @@ Ofrecer el recorrido reporte → número de caso → gestión administrativa →
 - Cuentas, perfiles o consulta pública para ciudadanos.
 - Registro público, múltiples administradores y recuperación de contraseña.
 - Publicación o uso con datos reales sin aprobación institucional.
-- Chatbot autónomo, casos relacionados y analítica avanzada.
+- Decisiones autónomas sobre culpabilidad, cierre o atención de casos; el agente siempre requiere confirmación y revisión humana cuando corresponda.
 
 ## Historias y criterios de aceptación
 

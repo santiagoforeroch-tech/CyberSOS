@@ -41,6 +41,13 @@ class Settings(BaseSettings):
     clamav_host: str = "127.0.0.1"
     clamav_port: int = 3310
     clamav_timeout_seconds: int = 15
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-3.6-flash"
+    openai_api_key: str = ""
+    openai_model: str = "gpt-5"
+    ai_provider: str = "gemini"
+    ai_agent_enabled: bool = False
+    ai_agent_max_history_messages: int = 20
 
     model_config = SettingsConfigDict(
         env_file=PROJECT_ROOT / ".env",

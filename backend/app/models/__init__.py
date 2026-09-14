@@ -12,11 +12,12 @@ from app.models.whatsapp import (
     WhatsAppPollVote,
     WhatsAppProcessedEvent,
 )
+from app.models.agent import AgentConversation, AgentMessage
 
 __all__ = [
     "Base", "AIAnalysis", "CaseCounter", "CaseHistory", "DeletionAudit", "Evidence", "Observation", "Report",
     "WhatsAppConnection", "WhatsAppConversation", "WhatsAppMedia", "WhatsAppMessage", "WhatsAppMessageEvent",
-    "WhatsAppOutbox", "WhatsAppPoll", "WhatsAppPollOption", "WhatsAppPollVote", "WhatsAppProcessedEvent",
+    "WhatsAppOutbox", "WhatsAppPoll", "WhatsAppPollOption", "WhatsAppPollVote", "WhatsAppProcessedEvent", "AgentConversation", "AgentMessage",
 ]
 from app.models.case import AIAnalysis, CaseCounter, CaseHistory, DeletionAudit, Evidence, Observation, Report
 

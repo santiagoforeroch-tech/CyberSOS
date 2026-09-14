@@ -5,6 +5,16 @@
 
 ## Renovación de CyberSOS como plataforma de ciberdenuncias
 
+## Nueva funcionalidad aprobada: agente conversacional con IA
+
+- [ ] Implementar agente ciudadano natural con Gemini detrás de FastAPI.
+- [ ] Mantener el formulario actual como respaldo durante la validación.
+- [ ] Hacer que la IA produzca un borrador estructurado y nunca escriba directamente en Supabase.
+- [ ] Exigir confirmación ciudadana antes de crear el reporte.
+- [ ] Registrar conversación, resumen y trazabilidad sin guardar secretos.
+- [ ] Añadir límites de uso, detección de solicitudes sensibles y derivación humana.
+- [ ] Integrar primero en web y después reutilizar el servicio para WhatsApp.
+
 - [x] Conectar y aplicar las migraciones existentes al nuevo proyecto Supabase de desarrollo `kmjlwaviqqznjagrgkpd`; no trasladar datos reales.
 
 - [x] Reparar el arranque local y verificar el envío de reportes con la base de desarrollo.

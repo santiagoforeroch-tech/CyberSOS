@@ -30,6 +30,7 @@ Entidades: contadores anuales, reportes, evidencias, análisis IA, observaciones
 - Web: React → FastAPI.
 - WhatsApp (desarrollo local): puente Baileys aislado → webhook firmado de FastAPI → servicio de reportes. El puente usa una única cuenta dedicada, conserva solo mensajes nuevos y nunca se ejecuta en el frontend ni en una función serverless.
 - No se usa un asistente de IA para procesar denuncias.
+- El agente ciudadano usa Gemini únicamente desde FastAPI mediante un adaptador de proveedor. La IA devuelve texto y un borrador estructurado validado por Pydantic; nunca accede directamente a Supabase ni crea reportes sin confirmación explícita.
 - Secretos únicamente en `.env`; nunca variables `VITE_*` salvo la URL pública de la API.
 
 ## Separación de accesos
