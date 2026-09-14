@@ -1,5 +1,5 @@
 /* Canonical CyberSOS theme loaded after legacy styles so the reference design wins. */
-html,body,#root{max-width:100%;overflow-x:hidden}
+html,body,#root{max-width:100%;min-width:0;overflow-x:hidden}
 body,.public-shell,.protection-page,.protection-menus{background:#080a0e!important;color:#f6f4fb!important}
 .protection-menu,.protection-menu-content,.protection-card,.security-test,.guides-section,.tools-section,.faq-section{background:#101218!important;color:#f6f4fb!important;border-color:#303340!important}
 .protection-menu summary,.protection-menu summary strong,.guide-list summary,.faq-section summary,.protection-card h3,.protection-menu-content h2,.protection-menu-content h3{color:#fff!important}.protection-menu summary small,.protection-intro,.protection-menu-content p,.guide-list p,.faq-section p{color:#d2d0de!important}
