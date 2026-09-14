@@ -92,3 +92,12 @@
 - [ ] Verificar el flujo actualizado en navegador y corregir el bloqueo local de Vitest/build causado por permisos de esbuild en OneDrive.
 - [x] Crear Centro de protección público con guía rápida, checklist, recursos oficiales y acceso directo al reporte.
 - [x] Añadir botón de riesgo inmediato, test de seguridad, guías por incidente, checklist descargable, compartir, preguntas frecuentes e indicador de progreso.
+
+## Verificación frontend 2026-09-13
+
+- [x] Corregir navegación de “Cómo funciona” para llevar al ancla correcta sin rutas hash duplicadas.
+- [x] Retirar controles visuales sin función real del login y del menú administrativo.
+- [x] Hacer copiable el número de caso y mostrar confirmación accesible.
+- [x] Evitar desbordes de textos largos en tablas, detalles, cronologías y confirmaciones.
+- [x] Ajustar navegación del panel administrativo en móvil y recortar el overflow horizontal decorativo.
+- [x] Verificar ESLint, Vitest, build Vite y Pytest antes de publicar.
