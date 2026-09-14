@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-13 (cierre técnico de producción):** Se añadieron encabezados CSP, `nosniff`, `DENY`, política de referer y permisos mínimos en `vercel.json`, además de un workflow de GitHub Actions que ejecuta Pytest, ESLint, Vitest y build antes de aceptar cambios. Se reforzó el contraste del login y se verificó en la URL pública con caché nuevo. Verificación local: backend 10/10, frontend 6/6, ESLint correcto, build Vite correcto, JSON de Vercel válido y escaneo de patrones de credenciales limpio. Queda pendiente únicamente la configuración/validación de credenciales externas y operaciones institucionales.
+
 - **Actualización 2026-09-13 (Centro de protección ampliado):** `/proteccion` ahora incluye modo de riesgo inmediato, test local de tres preguntas con progreso, cinco guías por tipo de incidente, descarga de checklist, compartir/copia de enlace, preguntas frecuentes y enlaces a reportar. Frontend verificado con ESLint y 6 pruebas aprobadas.
 
 - **Actualización 2026-09-13 (derivación oficial Colombia):** La confirmación de cada reporte ahora orienta explícitamente al ciudadano hacia CAI Virtual y ADenunciar para la denuncia formal, aclarando que CyberSOS es complementario y no un canal oficial. Se añadieron enlaces externos seguros y se verificó el frontend con 6 pruebas aprobadas.

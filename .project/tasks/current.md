@@ -1,5 +1,8 @@
 # Tarea actual
 
+- [x] Reforzar el cierre de producción: encabezados de seguridad en Vercel, verificación CI para backend/frontend y contraste accesible del login.
+- [x] Validar localmente el cierre: backend 10/10, frontend 6/6, ESLint, build Vite, JSON de Vercel y escaneo de patrones de credenciales.
+
 ## Renovación de CyberSOS como plataforma de ciberdenuncias
 
 - [x] Conectar y aplicar las migraciones existentes al nuevo proyecto Supabase de desarrollo `kmjlwaviqqznjagrgkpd`; no trasladar datos reales.
