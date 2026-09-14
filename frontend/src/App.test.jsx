@@ -16,6 +16,7 @@ describe('App', () => {
     render(<App />)
 
     expect(screen.getByRole('heading', { name: /Hay problemas por ahí\.? Actúa a tiempo\./i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Cómo funciona' })).toHaveAttribute('href', '/#como-funciona')
   })
 
   it('muestra la bandeja administrativa', async () => {

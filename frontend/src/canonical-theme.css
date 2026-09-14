@@ -22,3 +22,7 @@ body,.public-shell,.protection-page,.protection-menus{background:#080a0e!importa
 .admin-login-page .login-security-note{color:#475467!important;font-weight:600}
 .admin-login-page .login-form-area small{color:#667085!important}
 .admin-login-page .login-form-area .icon-tile{color:#5b8d00!important}
+.copy-feedback{display:block;margin:-10px 0 18px;color:#5b8d00!important;font-weight:800;text-align:center}
+.table-row>* ,.detail-card dd,.timeline-item strong,.case-number span{min-width:0;overflow-wrap:anywhere}
+.admin-shell>main,.report-table,.detail-card,.confirmation,.section-heading>div{min-width:0}
+@media(max-width:680px){.admin-shell aside{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;overflow:visible}.admin-shell aside .brand{grid-column:1;grid-row:1}.admin-shell aside>.back-public{grid-column:2;grid-row:1;margin:0;padding:10px 0;justify-self:end}.admin-shell aside nav{grid-column:1/-1;grid-row:2;width:100%;min-width:0;overflow-x:auto;padding-bottom:3px;margin:0}.admin-shell aside nav a{flex:0 0 auto}.admin-shell aside>.admin-logout{grid-column:1/-1;grid-row:3;margin:0;padding:10px 0}}
