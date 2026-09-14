@@ -6,3 +6,19 @@ body,.public-shell,.protection-page,.protection-menus{background:#080a0e!importa
 .public-header{background:#07090d!important;color:#fff!important}.public-header nav .public-admin-link{color:#a6ff00!important}.auth-card{background:#101218!important;color:#f6f4fb!important}.admin-login-page .login-form-area .auth-card{background:#fdfdff!important;color:#202638!important}.admin-login-page .login-form-area .auth-card h1{color:#202638!important}.admin-login-page .login-form-area .auth-card label{color:#657087!important}.admin-login-page .login-form-area .auth-card>p:not(.eyebrow){color:#b9b9c9!important}
 .admin-shell,.admin-shell>main{background:#080a0e!important;color:#f6f4fb!important}.admin-shell aside{background:linear-gradient(180deg,#07090d,#210a30)!important}.admin-shell h1,.admin-shell h2,.admin-shell h3,.admin-shell strong{color:#fff!important}.admin-shell p,.admin-shell small{color:#c7c4d3}.hero-actions{display:flex;flex-wrap:nowrap;gap:16px}.hero-actions .button{white-space:nowrap}
 @media(max-width:900px){.hero-actions{flex-wrap:wrap}}@media(max-width:760px){.hero-actions .button{flex:1 1 100%}.public-header nav .public-admin-link{display:inline-flex!important}}
+
+/* Login: preserve the white reference card while keeping every text element readable. */
+.admin-login-page .login-form-area .auth-card .eyebrow{color:#4f7d00!important;font-weight:800}
+.admin-login-page .login-form-area .auth-card>p:not(.eyebrow){color:#475467!important}
+.admin-login-page .login-form-area .auth-card label{color:#344054!important;font-weight:700}
+.admin-login-page .login-form-area .auth-card input{color:#f8fafc!important;background:#151821!important;border:1px solid #667085!important}
+.admin-login-page .login-form-area .auth-card input::placeholder{color:#b8beca!important;opacity:1}
+.admin-login-page .login-form-area .auth-card input:focus{outline:3px solid #00a6c733!important;border-color:#007ea3!important;box-shadow:0 0 0 1px #007ea3!important}
+.admin-login-page .login-form-area .auth-card .password-field button{color:#c4cad6!important}
+.admin-login-page .login-form-area .auth-card .password-field button:hover,.admin-login-page .login-form-area .auth-card .password-field button:focus-visible{color:#a6ff00!important}
+.admin-login-page .login-options label{color:#475467!important}
+.admin-login-page .login-options a{color:#4b2a86!important;font-weight:700}
+.admin-login-page .auth-divider{color:#586174!important}
+.admin-login-page .login-security-note{color:#475467!important;font-weight:600}
+.admin-login-page .login-form-area small{color:#667085!important}
+.admin-login-page .login-form-area .icon-tile{color:#5b8d00!important}
