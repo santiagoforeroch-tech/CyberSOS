@@ -1,7 +1,7 @@
 import hmac
 import logging
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 from app.core.config import settings
@@ -25,6 +25,16 @@ class ActivationInput(BaseModel):
     access_token: str
     refresh_token: str
     password: str
+
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetInput(BaseModel):
+    access_token: str
+    refresh_token: str
+    password: str = Field(min_length=6, max_length=128)
 
 
 class AdminRegistrationInput(BaseModel):
@@ -142,6 +152,39 @@ def register_admin(payload: AdminRegistrationInput, response: Response) -> dict:
         if "invalid login credentials" in str(exc).casefold():
             raise HTTPException(422, "La cuenta no pudo iniciar sesión después de crearse. Usa una contraseña de al menos 6 caracteres e inténtalo de nuevo") from exc
         raise HTTPException(502, "No fue posible crear la cuenta administrativa") from exc
+
+
+@router.post("/request-password-reset")
+def request_password_reset(payload: PasswordResetRequest, request: Request) -> dict:
+    if settings.auth_provider != "supabase":
+        raise HTTPException(503, "La recuperación por correo solo está disponible con Supabase")
+    try:
+        auth_client().auth.reset_password_for_email(
+            str(payload.email),
+            options={"redirect_to": f"{str(request.base_url).rstrip('/')}/#/admin/restablecer"},
+        )
+    except Exception as exc:
+        logger.warning("No fue posible solicitar recuperación de contraseña: %s", exc)
+    return {"message": "Si el correo corresponde a una cuenta autorizada, recibirás un enlace de recuperación."}
+
+
+@router.post("/reset-password")
+def reset_password(payload: PasswordResetInput, response: Response) -> dict:
+    if settings.auth_provider != "supabase":
+        raise HTTPException(503, "La recuperación por correo solo está disponible con Supabase")
+    try:
+        client = auth_client()
+        session = client.auth.set_session(payload.access_token, payload.refresh_token)
+        if not session.user or not session.session:
+            raise HTTPException(401, "El enlace de recuperación no es válido o ya venció")
+        updated = client.auth.update_user({"password": payload.password})
+        require_institutional_admin(updated.user.email, updated.user.app_metadata)
+        set_supabase_cookies(response, session.access_token, session.refresh_token)
+        return {"updated": True}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(401, "El enlace de recuperación no es válido o ya venció") from exc
 
 
 @router.post("/activate")
