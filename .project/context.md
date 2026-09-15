@@ -8,7 +8,7 @@
 - **Autenticación:** Un administrador mediante Supabase Auth y MFA TOTP; ciudadanos sin cuenta
 - **Supabase project ref:** `kmjlwaviqqznjagrgkpd`
 - **Región:** Por confirmar desde el proyecto conectado
-- **MCP:** Pendiente de reconectar al nuevo proyecto de desarrollo; no aplicar migraciones hasta validar la conexión PostgreSQL.
+- **MCP:** Configurado para el nuevo proyecto de desarrollo mediante el token privado de usuario `SUPABASE_ACCESS_TOKEN`; falta recargar Codex y verificar las herramientas antes de aplicar migraciones.
 - **UI/UX Pro Max:** Instalado y verificado; versión `2.15.0`
 - **Propiedad y administración:** La organización Supabase APOLO y el panel CyberSOS están autorizados para `santiagoforeroch@gmail.com`. Son identidades separadas: cuenta del Dashboard y usuario de Supabase Auth, ambas con MFA obligatorio.
 

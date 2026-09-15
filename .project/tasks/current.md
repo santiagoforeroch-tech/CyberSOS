@@ -7,7 +7,7 @@
 
 ## Nueva funcionalidad aprobada: agente conversacional con IA
 
-- [ ] Implementar agente ciudadano natural con Gemini detrás de FastAPI.
+- [x] Implementar agente ciudadano temporal con mensajes predeterminados detrás de FastAPI, sin API keys.
 - [ ] Mantener el formulario actual como respaldo durante la validación.
 - [ ] Hacer que la IA produzca un borrador estructurado y nunca escriba directamente en Supabase.
 - [ ] Exigir confirmación ciudadana antes de crear el reporte.
