@@ -230,7 +230,13 @@ def mfa(
         raise HTTPException(401, "La verificación MFA expiró; inicia sesión nuevamente")
     try:
         client = auth_client()
-        verified = client.auth.verify_otp({"email": mfa_email, "token": payload.code, "type": "email"})
+        try:
+            verified = client.auth.verify_otp({"email": mfa_email, "token": payload.code, "type": "email"})
+        except Exception:
+            # Compatibilidad con proyectos que todavía emiten OTP desde la
+            # plantilla histórica de Magic Link. Supabase recomienda `email`;
+            # este segundo intento evita romper activaciones ya configuradas.
+            verified = client.auth.verify_otp({"email": mfa_email, "token": payload.code, "type": "magiclink"})
         if not verified.user or not verified.session:
             raise HTTPException(401, "El código de correo no es válido o ya venció")
         require_institutional_admin(verified.user.email, verified.user.app_metadata)
