@@ -19,6 +19,7 @@ class LoginInput(BaseModel):
 
 class MfaInput(BaseModel):
     code: str
+    email: EmailStr | None = None
 
 
 class ActivationInput(BaseModel):
@@ -226,17 +227,18 @@ def mfa(
         response.delete_cookie("mfa_pending", secure=settings.cookie_secure, samesite="strict")
         return {"authenticated": True, "aal": "aal2"}
 
-    if not mfa_email:
+    verification_email = mfa_email or (str(payload.email) if payload.email else None)
+    if not verification_email:
         raise HTTPException(401, "La verificación MFA expiró; inicia sesión nuevamente")
     try:
         client = auth_client()
         try:
-            verified = client.auth.verify_otp({"email": mfa_email, "token": payload.code, "type": "email"})
+            verified = client.auth.verify_otp({"email": verification_email, "token": payload.code, "type": "email"})
         except Exception:
             # Compatibilidad con proyectos que todavía emiten OTP desde la
             # plantilla histórica de Magic Link. Supabase recomienda `email`;
             # este segundo intento evita romper activaciones ya configuradas.
-            verified = client.auth.verify_otp({"email": mfa_email, "token": payload.code, "type": "magiclink"})
+            verified = client.auth.verify_otp({"email": verification_email, "token": payload.code, "type": "magiclink"})
         if not verified.user or not verified.session:
             raise HTTPException(401, "El código de correo no es válido o ya venció")
         require_institutional_admin(verified.user.email, verified.user.app_metadata)
@@ -246,7 +248,10 @@ def mfa(
     except HTTPException:
         raise
     except Exception as exc:
-        raise HTTPException(401, "Código MFA incorrecto o vencido") from exc
+        message = str(exc).casefold()
+        if "expired" in message or "invalid" in message or "token" in message:
+            raise HTTPException(401, "El código no es válido, ya venció o fue reemplazado por uno más reciente") from exc
+        raise HTTPException(401, "No fue posible verificar el código con Supabase; vuelve a iniciar sesión") from exc
 
 
 @router.post("/logout", status_code=204)
