@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-5"
     ai_provider: str = "gemini"
     ai_agent_enabled: bool = False
+    ai_local_mode: bool = True
     ai_agent_max_history_messages: int = 20
 
     model_config = SettingsConfigDict(

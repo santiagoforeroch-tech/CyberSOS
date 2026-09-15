@@ -43,7 +43,9 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
 
 
 async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
-    if not settings.ai_agent_enabled or (not settings.gemini_api_key and not settings.openai_api_key):
+    # El MVP funciona sin claves externas. Los proveedores solo se usan cuando
+    # el modo local se desactiva expresamente en una configuración privada.
+    if settings.ai_local_mode or not settings.ai_agent_enabled or (not settings.gemini_api_key and not settings.openai_api_key):
         return _local_chat(payload)
     if settings.ai_provider == "openai":
         return await _chat_openai(payload)
