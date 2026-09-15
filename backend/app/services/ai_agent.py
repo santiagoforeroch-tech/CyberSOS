@@ -12,14 +12,25 @@ Analiza la conversación y devuelve JSON válido con estas claves: message (resp
 
 
 KEYWORDS = {
-    "phishing": ("phishing", "enlace falso", "mensaje falso", "correo sospechoso", "sms sospechoso", "premio falso", "banco falso", "robaron mi clave"),
-    "fraude/estafa digital": ("estafa", "fraude", "me engañaron", "perdí dinero", "transferencia", "venta falsa", "inversión falsa", "cobro falso", "tienda falsa"),
-    "suplantación": ("suplant", "perfil falso", "se hacen pasar", "identidad falsa", "cuenta falsa", "clonaron mi perfil"),
-    "robo o acceso no autorizado a cuenta": ("hackearon", "hackeada", "entraron a mi cuenta", "perdí el acceso", "me robaron whatsapp", "sesión desconocida", "cambiaron mi contraseña"),
-    "robo de información": ("robaron mis datos", "publicaron mis datos", "documentos", "filtraron", "datos personales", "fotos privadas", "información confidencial"),
-    "amenaza/acoso digital": ("amenaza", "acoso", "insultan", "intimidan", "persiguen", "hostigamiento", "mensajes repetidos"),
-    "extorsión cibernética": ("extorsión", "extorsion", "chantaje", "me exigen dinero", "no divulgar", "amenazan con publicar"),
-    "malware": ("virus", "malware", "ransomware", "bloqueó mis archivos", "archivo malicioso", "aplicación extraña", "computador infectado"),
+    "phishing": ("phishing", "enlace falso", "link falso", "mensaje falso", "mensaje sospechoso", "correo sospechoso", "correo raro", "sms sospechoso", "whatsapp sospechoso", "pide datos", "pide mis datos", "datos bancarios", "clave bancaria", "premio falso", "banco falso", "robaron mi clave"),
+    "fraude/estafa digital": ("estafa", "fraude", "me engañaron", "perdí dinero", "perdi dinero", "transferencia", "pago", "consignación", "consignacion", "venta falsa", "inversión falsa", "inversion falsa", "cobro falso", "tienda falsa", "oferta falsa"),
+    "suplantación": ("suplant", "perfil falso", "se hacen pasar", "identidad falsa", "cuenta falsa", "clonaron mi perfil", "usaron mi foto", "fingiendo ser"),
+    "robo o acceso no autorizado a cuenta": ("hackearon", "hackeada", "hackeado", "entraron a mi cuenta", "perdí el acceso", "perdi el acceso", "me robaron whatsapp", "sesión desconocida", "sesion desconocida", "cambiaron mi contraseña", "cambiaron mi contrasena", "no puedo entrar", "me sacaron de"),
+    "robo de información": ("robaron mis datos", "publicaron mis datos", "documentos", "filtraron", "filtración", "filtracion", "datos personales", "fotos privadas", "información confidencial", "informacion confidencial"),
+    "amenaza/acoso digital": ("amenaza", "acoso", "insultan", "intimidan", "persiguen", "hostigamiento", "mensajes repetidos", "me molestan", "me están acosando", "me estan acosando"),
+    "extorsión cibernética": ("extorsión", "extorsion", "chantaje", "me exigen dinero", "piden dinero", "no divulgar", "amenazan con publicar", "publicar mis fotos", "difundir mis fotos"),
+    "malware": ("virus", "malware", "ransomware", "bloqueó mis archivos", "bloqueo mis archivos", "archivo malicioso", "aplicación extraña", "aplicacion extraña", "computador infectado", "celular infectado", "pantalla bloqueada"),
+}
+
+FOLLOW_UPS = {
+    "phishing": ("Esto parece un intento de phishing. No abras enlaces ni compartas datos; entra al sitio oficial escribiendo la dirección manualmente. ¿Te llegó por correo, SMS, WhatsApp o una red social?", "Para conservar la evidencia, ¿guardaste el mensaje, el enlace y el nombre o número del remitente?"),
+    "fraude/estafa digital": ("Lamento que te haya ocurrido. Contacta al banco o plataforma por su canal oficial si hubo un pago. ¿Qué ofrecían, por qué medio hablaste y en qué fecha ocurrió?", "¿Conservas comprobantes de pago, conversación, perfil, enlace o número de cuenta usado?"),
+    "suplantación": ("Parece una posible suplantación. Guarda el enlace o nombre del perfil falso y avisa a tus contactos por otro medio. ¿En qué red o aplicación apareció?", "¿La persona está usando tu nombre, fotos, número o pidiendo dinero a tus contactos?"),
+    "robo o acceso no autorizado a cuenta": ("Entiendo. Cambia la contraseña desde un dispositivo confiable y cierra sesiones abiertas si todavía puedes acceder. ¿Qué cuenta fue afectada y cuándo notaste el acceso?", "¿Recibiste avisos de inicio de sesión, cambios de contraseña o mensajes enviados sin tu permiso?"),
+    "robo de información": ("Tomemos esto con calma. Conserva capturas y evita borrar mensajes o archivos relacionados. ¿Qué tipo de información fue expuesta y dónde la viste publicada o compartida?", "¿Tienes el enlace, capturas o el nombre del perfil, sitio o persona que compartió la información?"),
+    "amenaza/acoso digital": ("Siento que estés pasando por esto. No respondas bajo presión y conserva todas las pruebas. ¿La amenaza menciona un daño físico, información privada o contacto fuera de internet?", "¿Puedes indicar la plataforma, fecha aproximada y el usuario o número desde el que llegó?"),
+    "extorsión cibernética": ("No pagues ni envíes más información. Guarda las conversaciones y contacta a las autoridades si hay peligro inmediato. ¿Qué te están exigiendo y por cuál canal te contactaron?", "¿Conservas capturas, el número o perfil, solicitudes de pago y la fecha de los mensajes?"),
+    "malware": ("Desconecta el dispositivo de internet si notas actividad extraña y no ingreses más contraseñas. ¿Qué ocurrió: archivo bloqueado, ventana extraña, cobro o aplicación desconocida?", "¿Recuerdas qué archivo, enlace o aplicación abriste antes del problema y tienes alguna captura del aviso?"),
 }
 
 
@@ -37,8 +48,13 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
     if not any(word in text for word in ("captura", "evidencia", "pantallazo", "enlace", "archivo")):
         missing.append("Si conservas capturas, enlaces, archivos o nombres de usuario")
     ready = bool(category and len(facts) >= 2)
-    message = ("Ya organicé un borrador. Revisa la información, agrega tus datos de contacto y confirma solo si todo es correcto."
-               if ready else "Puedo ayudarte con phishing, estafas, suplantación, acceso a cuentas, robo de información, amenazas, extorsión, malware u otro incidente digital. ¿Qué ocurrió exactamente y cuándo? No compartas contraseñas ni códigos.")
+    if ready:
+        message = "Ya organicé lo que me contaste en un borrador. Revisa el resumen, agrega un medio de contacto y confirma solo si representa correctamente tu caso."
+    elif category:
+        first_question, evidence_question = FOLLOW_UPS[category]
+        message = first_question if len(facts) == 1 else evidence_question
+    else:
+        message = "Gracias por contarme. Para orientarte mejor, dime qué pasó: ¿recibiste un mensaje, perdiste una cuenta, hubo un cobro, publicaron información o te amenazaron? No compartas contraseñas ni códigos."
     return AgentChatResponse(message=message, draft=AgentDraft(category=category, priority=priority, summary=" ".join(facts), facts=facts, missing_information=missing, evidence_requested=["Capturas, enlaces o archivos relacionados"], needs_human_review=True), ready_to_confirm=ready)
 
 
