@@ -8,6 +8,7 @@
 ## Nueva funcionalidad aprobada: agente conversacional con IA
 
 - [x] Implementar agente ciudadano temporal con mensajes predeterminados detrás de FastAPI, sin API keys.
+- [x] Desacoplar el chat temporal de la persistencia de conversaciones para que pueda responder aun si la tabla de conversaciones no está disponible.
 - [ ] Mantener el formulario actual como respaldo durante la validación.
 - [ ] Hacer que la IA produzca un borrador estructurado y nunca escriba directamente en Supabase.
 - [ ] Exigir confirmación ciudadana antes de crear el reporte.
