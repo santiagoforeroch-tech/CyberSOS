@@ -242,7 +242,11 @@ def mfa(
         if not verified.user or not verified.session:
             raise HTTPException(401, "El código de correo no es válido o ya venció")
         require_institutional_admin(verified.user.email, verified.user.app_metadata)
-        set_supabase_cookies(response, verified.access_token, verified.refresh_token)
+        # Supabase devuelve los tokens dentro de `session`. Leerlos desde el
+        # objeto de respuesta provocaba que una verificación correcta no
+        # pudiera completar la sesión administrativa.
+        set_supabase_cookies(response, verified.session.access_token, verified.session.refresh_token)
+        response.delete_cookie("mfa_pending", secure=settings.cookie_secure, samesite="strict", path="/")
         response.delete_cookie("mfa_email", path="/")
         return {"authenticated": True, "aal": "aal2"}
     except HTTPException:
