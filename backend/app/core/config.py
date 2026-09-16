@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     ai_agent_enabled: bool = False
     ai_local_mode: bool = True
     ai_agent_max_history_messages: int = 20
+    telegram_bot_token: str = ""
+    telegram_webhook_secret: str = ""
+    telegram_enabled: bool = False
 
     model_config = SettingsConfigDict(
         env_file=PROJECT_ROOT / ".env",
