@@ -143,7 +143,7 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
     # perder los datos relevantes del reporte.
     contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": item.content}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent"
-    body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 400}}
+    body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 900}}
     async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
         response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
         response.raise_for_status()
@@ -154,6 +154,8 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
     response_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
     if response_text.startswith("```"):
         response_text = response_text.removeprefix("```").removeprefix("json").removesuffix("```").strip()
+    if not response_text:
+        raise ValueError("Gemini devolvió una respuesta vacía")
     parsed = AgentChatResponse.model_validate(json.loads(response_text))
     if parsed.draft.category not in (*CATEGORIES, None):
         parsed.draft.category = "otro"
