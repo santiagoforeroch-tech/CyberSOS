@@ -64,7 +64,8 @@ def test_citizen_report_and_admin_history(monkeypatch) -> None:
 
             login = await client.post("/api/v1/auth/login", json={"email": "admin@cybersos.example", "password": "CyberSOS-Demo-2026"})
             assert login.status_code == 200
-            assert (await client.post("/api/v1/auth/mfa/verify", json={"code": "123456"})).status_code == 200
+            # Después de la activación inicial, el acceso administrativo
+            # se completa únicamente con correo y contraseña.
             reports = await client.get("/api/v1/admin/reports")
             assert reports.status_code == 200
             assert reports.json()["items"][0]["case_number"] == created.json()["case_number"]

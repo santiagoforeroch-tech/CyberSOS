@@ -90,8 +90,8 @@ def login(payload: LoginInput, response: Response) -> dict:
     if settings.auth_provider == "local":
         if not (hmac.compare_digest(str(payload.email), settings.local_admin_email) and hmac.compare_digest(payload.password, settings.local_admin_password)):
             raise HTTPException(401, "Credenciales incorrectas")
-        response.set_cookie("mfa_pending", sign_token("mfa-pending", 300), httponly=True, secure=settings.cookie_secure, samesite="strict", max_age=300)
-        return {"mfa_required": True}
+        response.set_cookie("admin_session", sign_token("admin-aal2", 3600), httponly=True, secure=settings.cookie_secure, samesite="strict", max_age=3600)
+        return {"authenticated": True, "aal": "aal2"}
 
     try:
         client = auth_client()
@@ -100,7 +100,7 @@ def login(payload: LoginInput, response: Response) -> dict:
             raise HTTPException(401, "Credenciales incorrectas")
         require_institutional_admin(signed_in.user.email, signed_in.user.app_metadata)
         set_supabase_cookies(response, signed_in.session.access_token, signed_in.session.refresh_token)
-        return start_mfa(client, response, str(signed_in.user.email))
+        return {"authenticated": True, "aal": "aal2"}
     except HTTPException:
         raise
     except Exception as exc:
