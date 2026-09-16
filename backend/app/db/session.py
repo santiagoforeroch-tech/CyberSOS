@@ -9,7 +9,8 @@ from app.core.config import settings
 
 @lru_cache
 def get_engine() -> Engine:
-    database_url = settings.database_url
+    # Vercel puede conservar comillas si se pegaron al configurar la variable.
+    database_url = settings.database_url.strip().strip('"').strip("'")
     # Supabase entrega URLs postgresql://; el proyecto usa psycopg v3.
     if database_url.startswith("postgresql://"):
         database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
