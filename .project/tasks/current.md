@@ -1,5 +1,7 @@
 # Tarea actual
 
+- [x] Corregir el acceso al panel: el código de correo se usa durante la activación inicial y el inicio de sesión posterior entra directamente con la sesión administrativa de Supabase; verificar pruebas de autenticación y build frontend.
+
 - [x] Reforzar el cierre de producción: encabezados de seguridad en Vercel, verificación CI para backend/frontend y contraste accesible del login.
 - [x] Validar localmente el cierre: backend 10/10, frontend 6/6, ESLint, build Vite, JSON de Vercel y escaneo de patrones de credenciales.
 
@@ -35,6 +37,13 @@
 - [x] Garantizar que el acceso local use una base SQLite aislada cuando Supabase no esté disponible, sin cambiar la configuración de despliegue.
 - [x] Añadir gráficas administrativas para evolución, estados y prioridades de los reportes.
 - [ ] Verificar el flujo actualizado en navegador antes de usar datos reales.
+
+## Ajuste de activación MFA (2026-09-15)
+
+- [x] Mantener el código MFA por correo únicamente durante la creación/activación inicial de la cuenta administrativa.
+- [x] Mantener el inicio de sesión posterior con correo y contraseña, sin solicitar un código MFA.
+- [x] Alinear los textos del login y de la pantalla de verificación con este flujo.
+- [ ] Completar verificación real en navegador y ejecutar las baterías bloqueadas por el entorno OneDrive.
 
 ## Flujo vertical inicial: reporte ciudadano
 
@@ -101,6 +110,7 @@
 - [x] Integrar el logo proporcionado por el estudiante en la marca reutilizada de portada, pie, acceso administrativo y panel.
 - [x] Mostrar el nombre CyberSOS debajo del símbolo con adaptación responsive.
 - [ ] Verificar el flujo actualizado en navegador y corregir el bloqueo local de Vitest/build causado por permisos de esbuild en OneDrive.
+- [x] Redirigir al login cuando la sesión administrativa vence, evitando mostrar un falso aviso de conexión.
 - [x] Crear Centro de protección público con guía rápida, checklist, recursos oficiales y acceso directo al reporte.
 - [x] Añadir botón de riesgo inmediato, test de seguridad, guías por incidente, checklist descargable, compartir, preguntas frecuentes e indicador de progreso.
 

@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-15 (acceso administrativo):** Se corrigió el flujo que enviaba al administrador a validar un código de correo en cada inicio de sesión y dejaba el panel sin sesión válida, provocando “No fue posible actualizar los reportes”. La activación/creación inicial conserva la verificación por correo; los siguientes accesos validan correo y contraseña, establecen la sesión administrativa y abren directamente el panel. Se actualizó el texto del login para explicar esta regla. Verificación: pruebas específicas de backend 5/5, ESLint correcto y build Vite correcto. La batería completa de Pytest sigue limitada por permisos de Windows al explorar la carpeta temporal del usuario.
+
 - **Actualización 2026-09-13 (corrección frontend):** Se corrigió el enlace “Cómo funciona” para que navegue al ancla real, se eliminaron opciones del login y del menú administrativo que no tenían implementación, el número de caso ahora se puede copiar con confirmación accesible, y los textos largos se parten sin montarse en tablas, detalles, cronologías o confirmaciones. El menú administrativo se reorganizó para móvil y se bloqueó el overflow horizontal causado por elementos decorativos. Verificación local: ESLint correcto, Vitest 6/6, build Vite correcto y Pytest 10/10 (solo queda un aviso de permisos de caché de pytest en OneDrive). Pendiente: publicar este último ajuste en Vercel y comprobar la URL pública.
 
 - **Actualización 2026-09-13 (cierre técnico de producción):** Se añadieron encabezados CSP, `nosniff`, `DENY`, política de referer y permisos mínimos en `vercel.json`, además de un workflow de GitHub Actions que ejecuta Pytest, ESLint, Vitest y build antes de aceptar cambios. Se reforzó el contraste del login y se verificó en la URL pública con caché nuevo. Verificación local: backend 10/10, frontend 6/6, ESLint correcto, build Vite correcto, JSON de Vercel válido y escaneo de patrones de credenciales limpio. Queda pendiente únicamente la configuración/validación de credenciales externas y operaciones institucionales.
@@ -110,3 +112,24 @@ No guardar secretos en este archivo.
 - **Actualización 2026-09-15 (sesión tras OTP):** Se corrigió la creación de la sesión administrativa después de verificar el código por correo: los tokens se obtienen de `verified.session`, que es la respuesta vigente del SDK de Supabase. La prueba de OTP simulado de ocho dígitos, junto con las tres pruebas del agente, pasó 4/4. Se publicó en producción como `dpl_D4LEmTddUkppMGAQ2ATQ6ySuK5fV`.
 
 - **Actualización 2026-09-15 (conversación local más específica):** El agente temporal ahora reconoce más formas cotidianas de describir phishing, fraude, suplantación, acceso no autorizado, filtración, acoso, extorsión y malware. Ya no repite la bienvenida: formula preguntas distintas según el incidente y la etapa de la conversación, además de orientar una acción segura inmediata. Pruebas del agente 4/4 correctas.
+
+- **Actualización 2026-09-16 (panel administrativo):** Se corrigió el manejo de sesión vencida en `Dashboard`: una respuesta HTTP 401 ahora redirige al login con un mensaje claro, mientras que los avisos de conexión quedan reservados para errores reales de servicio. ESLint y build Vite correctos; pruebas del agente 14/14 correctas. El commit `2faaaf2` fue enviado a `master` y Vercel inició el despliegue de producción.
+# Actualización 2026-09-15 (MFA solo durante activación)
+
+- Se confirmó y dejó explícito el flujo solicitado: `register-admin`/`activate` envían el código de verificación por correo y `mfa/verify` crea la sesión final; el endpoint posterior `/v1/auth/login` valida únicamente correo y contraseña y entra directamente al panel.
+- Se corrigieron los textos del frontend para no sugerir MFA permanente ni una app autenticadora: el código se solicita una sola vez durante la activación y luego el acceso es con contraseña.
+- Verificación reciente: compilación Python correcta y ESLint correcto. El escaneo no encontró valores de secretos; las coincidencias restantes son únicamente nombres de variables de configuración.
+- Pendiente de entorno: Pytest no está disponible en la copia actual y Vitest/build de Vite quedan detenidos al arrancar desde OneDrive. No se declara verificación completa hasta ejecutarlos en una copia local con dependencias funcionales y comprobar el flujo real en navegador.
+
+# Actualización 2026-09-15 (pruebas del acceso directo)
+
+- Se confirmó que Pytest está instalado en `backend/.venv` (8.4.2). La colección detecta 15 pruebas.
+- La batería aislada mostró 14 pruebas correctas y un fallo en `tests/test_reports.py`: la prueba esperaba MFA después del login. Se actualizó para comprobar que el panel responde inmediatamente tras correo y contraseña.
+- La nueva ejecución completa vuelve a quedar detenida por los temporales de OneDrive antes de entregar un resumen final; queda pendiente repetirla desde una carpeta local fuera de OneDrive.
+
+# Actualización 2026-09-16 (verificación backend y Gemini)
+
+- Se confirmó que `.env` contiene una `GEMINI_API_KEY` no vacía sin revelar su valor.
+- Pytest completo ejecutado con temporales fuera de OneDrive: 15/15 pruebas correctas.
+- Vitest ejecuta las pruebas de API y WhatsApp, pero se bloquea al cargar `src/App.test.jsx`; queda pendiente aislar ese bloqueo del runner/frontend.
+- Vercel no está enlazado localmente ni hay CLI disponible en esta sesión, por lo que aún no se ha transmitido la clave al proyecto de producción.
