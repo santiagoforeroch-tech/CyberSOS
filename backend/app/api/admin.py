@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from datetime import datetime, timezone
+import logging
 
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
@@ -12,6 +13,7 @@ from app.schemas.reports import ObservationCreate, ReportSummary, ReportUpdate
 from app.services.evidence import create_download_url
 
 router = APIRouter(prefix="/v1/admin", tags=["admin"], dependencies=[Depends(require_admin)])
+logger = logging.getLogger(__name__)
 
 
 def _private_query(query):
@@ -30,7 +32,11 @@ def reports(search: str = "", status: str = "", priority: str = "", db: Session 
         query = query.where(Report.status == status)
     if priority:
         query = query.where(Report.priority == priority)
-    items = db.execute(_private_query(query.order_by(Report.created_at.desc()).limit(100))).scalars().all()
+    try:
+        items = db.execute(_private_query(query.order_by(Report.created_at.desc()).limit(100))).scalars().all()
+    except Exception:
+        logger.exception("admin reports query failed")
+        raise HTTPException(503, "Base de datos administrativa no disponible")
     return {"items": [ReportSummary.model_validate(item).model_dump(mode="json") for item in items]}
 
 
@@ -77,10 +83,14 @@ def observation(report_id: str, payload: ObservationCreate, db: Session = Depend
 
 @router.get("/statistics")
 def statistics(db: Session = Depends(get_db)) -> dict:
-    reports = db.execute(_private_query(select(Report))).scalars().all()
-    by_status = dict(db.execute(_private_query(select(Report.status, func.count()).group_by(Report.status))).all())
-    by_category = dict(db.execute(_private_query(select(Report.category, func.count()).group_by(Report.category).order_by(func.count().desc()))).all())
-    by_priority = dict(db.execute(_private_query(select(Report.priority, func.count()).group_by(Report.priority))).all())
+    try:
+        reports = db.execute(_private_query(select(Report))).scalars().all()
+        by_status = dict(db.execute(_private_query(select(Report.status, func.count()).group_by(Report.status))).all())
+        by_category = dict(db.execute(_private_query(select(Report.category, func.count()).group_by(Report.category).order_by(func.count().desc()))).all())
+        by_priority = dict(db.execute(_private_query(select(Report.priority, func.count()).group_by(Report.priority))).all())
+    except Exception:
+        logger.exception("admin statistics query failed")
+        raise HTTPException(503, "Base de datos administrativa no disponible")
     completed = [report for report in reports if report.status in {"Atendido", "Cerrado"}]
     average_hours = round(sum((report.updated_at - report.created_at).total_seconds() / 3600 for report in completed) / len(completed), 1) if completed else None
     today = datetime.now(timezone.utc).date()
