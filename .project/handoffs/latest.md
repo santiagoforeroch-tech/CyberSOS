@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-16 (alcance del panel):** Se retiraron completamente las acciones “Reportar caso” y “Centro de recursos” del centro administrativo, porque pertenecen al flujo público. El bloque de acciones rápidas conserva únicamente “Ver todos los casos” y “Generar informe”. ESLint y Vitest (6/6) correctos.
+
 - **Actualización 2026-09-16 (acciones rápidas visibles):** Se detectaron reglas CSS antiguas que ocultaban “Reportar caso”, “Generar informe” y “Centro de recursos” del panel. Se eliminaron; las cuatro acciones rápidas ahora se muestran. ESLint, Vitest (6/6) y `git diff --check` correctos.
 
 - **Actualización 2026-09-16 (verificación del panel administrativo):** Se detectó que la acción rápida “Generar informe” solo navegaba a la bandeja y no generaba ningún informe. Ahora descarga un CSV con los casos visibles en el centro de control, incluyendo caso, origen, categoría, estado, prioridad, reportante y fecha. ESLint, Vitest (6/6), Pytest (25/25) y `git diff --check` correctos.
