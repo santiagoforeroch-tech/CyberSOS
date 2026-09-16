@@ -5,12 +5,20 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.security import require_admin
+from app.core.config import settings
 from app.db.session import get_db
 from app.models import CaseHistory, Evidence, Observation, Report
 from app.schemas.reports import ObservationCreate, ReportSummary, ReportUpdate
 from app.services.evidence import create_download_url
 
 router = APIRouter(prefix="/v1/admin", tags=["admin"], dependencies=[Depends(require_admin)])
+
+
+def _private_query(query):
+    """Aplica el esquema de producción sin afectar las pruebas SQLite."""
+    if not settings.database_url.startswith("sqlite"):
+        return query.execution_options(schema_translate_map={None: "private"})
+    return query
 
 
 @router.get("/reports")
@@ -22,13 +30,13 @@ def reports(search: str = "", status: str = "", priority: str = "", db: Session 
         query = query.where(Report.status == status)
     if priority:
         query = query.where(Report.priority == priority)
-    items = db.execute(query.order_by(Report.created_at.desc()).limit(100)).scalars().all()
+    items = db.execute(_private_query(query.order_by(Report.created_at.desc()).limit(100))).scalars().all()
     return {"items": [ReportSummary.model_validate(item).model_dump(mode="json") for item in items]}
 
 
 @router.get("/reports/{report_id}")
 def detail(report_id: str, db: Session = Depends(get_db)) -> dict:
-    report = db.get(Report, report_id)
+    report = db.execute(_private_query(select(Report).where(Report.id == report_id))).scalar_one_or_none()
     if not report:
         raise HTTPException(404, "Reporte no encontrado")
     return {**ReportSummary.model_validate(report).model_dump(mode="json"), "description": report.description, "channel": report.channel, "contact_value": report.contact_value, "evidences": [{"id": e.id, "original_name": e.original_name, "mime_type": e.mime_type, "size_bytes": e.size_bytes, "created_at": e.created_at.isoformat()} for e in sorted(report.evidences, key=lambda x: x.created_at)], "history": [{"action": h.action, "details": h.details, "created_at": h.created_at.isoformat()} for h in sorted(report.history, key=lambda x: x.created_at, reverse=True)], "observations": [{"id": o.id, "text": o.text, "created_at": o.created_at.isoformat()} for o in sorted(report.observations, key=lambda x: x.created_at, reverse=True)]}
@@ -69,10 +77,10 @@ def observation(report_id: str, payload: ObservationCreate, db: Session = Depend
 
 @router.get("/statistics")
 def statistics(db: Session = Depends(get_db)) -> dict:
-    reports = db.execute(select(Report)).scalars().all()
-    by_status = dict(db.execute(select(Report.status, func.count()).group_by(Report.status)).all())
-    by_category = dict(db.execute(select(Report.category, func.count()).group_by(Report.category).order_by(func.count().desc())).all())
-    by_priority = dict(db.execute(select(Report.priority, func.count()).group_by(Report.priority)).all())
+    reports = db.execute(_private_query(select(Report))).scalars().all()
+    by_status = dict(db.execute(_private_query(select(Report.status, func.count()).group_by(Report.status))).all())
+    by_category = dict(db.execute(_private_query(select(Report.category, func.count()).group_by(Report.category).order_by(func.count().desc()))).all())
+    by_priority = dict(db.execute(_private_query(select(Report.priority, func.count()).group_by(Report.priority))).all())
     completed = [report for report in reports if report.status in {"Atendido", "Cerrado"}]
     average_hours = round(sum((report.updated_at - report.created_at).total_seconds() / 3600 for report in completed) / len(completed), 1) if completed else None
     today = datetime.now(timezone.utc).date()
