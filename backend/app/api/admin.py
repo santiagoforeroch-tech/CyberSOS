@@ -50,7 +50,7 @@ def detail(report_id: str, db: Session = Depends(get_db)) -> dict:
 
 @router.post("/evidences/{evidence_id}/download-url")
 def evidence_download(evidence_id: str, db: Session = Depends(get_db)) -> dict:
-    item = db.get(Evidence, evidence_id)
+    item = db.execute(_private_query(select(Evidence).where(Evidence.id == evidence_id))).scalar_one_or_none()
     if not item:
         raise HTTPException(404, "Evidencia no encontrada")
     url = create_download_url(item.storage_key)
@@ -61,7 +61,7 @@ def evidence_download(evidence_id: str, db: Session = Depends(get_db)) -> dict:
 
 @router.patch("/reports/{report_id}")
 def update(report_id: str, payload: ReportUpdate, db: Session = Depends(get_db)) -> dict:
-    report = db.get(Report, report_id)
+    report = db.execute(_private_query(select(Report).where(Report.id == report_id))).scalar_one_or_none()
     if not report:
         raise HTTPException(404, "Reporte no encontrado")
     changes = {}
@@ -75,7 +75,7 @@ def update(report_id: str, payload: ReportUpdate, db: Session = Depends(get_db))
 
 @router.post("/reports/{report_id}/observations", status_code=201)
 def observation(report_id: str, payload: ObservationCreate, db: Session = Depends(get_db)) -> dict:
-    if not db.get(Report, report_id):
+    if not db.execute(_private_query(select(Report.id).where(Report.id == report_id))).scalar_one_or_none():
         raise HTTPException(404, "Reporte no encontrado")
     item = Observation(report_id=report_id, text=payload.text); db.add(item); db.flush(); db.add(CaseHistory(report_id=report_id, action="Observación agregada", details={"observation_id": item.id}, actor_type="admin", actor_id="local-admin")); db.commit()
     return {"id": item.id, "message": "Observación agregada"}
