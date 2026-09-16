@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     clamav_port: int = 3310
     clamav_timeout_seconds: int = 15
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-3.6-flash"
     openai_api_key: str = ""
     openai_model: str = "gpt-5"
     ai_provider: str = "gemini"
