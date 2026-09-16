@@ -167,7 +167,7 @@ function Detail(){
 /* eslint-disable no-irregular-whitespace */
 function ControlCenter(){
   const navigate=useNavigate(); const [reports,setReports]=useState([]); const [stats,setStats]=useState({total:0,by_status:{},by_priority:{},trend:[]}); const [search,setSearch]=useState(''); const [error,setError]=useState('');
-  useEffect(()=>{let active=true; Promise.all([apiRequest('/v1/admin/reports'),apiRequest('/v1/admin/statistics')]).then(([r,s])=>{if(active){setReports(r.items);setStats(s)}}).catch(e=>{if(e.status===401)navigate('/admin/login',{replace:true});else setError('No fue posible cargar los datos del centro de control.')});return()=>{active=false}},[navigate])
+  useEffect(()=>{let active=true; const refresh=()=>Promise.all([apiRequest('/v1/admin/reports'),apiRequest('/v1/admin/statistics')]).then(([r,s])=>{if(active){setReports(r.items);setStats(s);setError('')}}).catch(e=>{if(!active)return;if(e.status===401)navigate('/admin/login',{replace:true});else setError('No fue posible cargar los datos del centro de control.')}); refresh(); const timer=window.setInterval(refresh,15000); return()=>{active=false;window.clearInterval(timer)}},[navigate])
   function exportReport(){
     const exportItems=[...recentItems,...items.filter(item=>!recentItems.some(recent=>recent.id===item.id))];
     const safeCell=value=>{const text=String(value??''); const protectedText=/^[=+\-@]/.test(text)?`'${text}`:text; return `"${protectedText.replaceAll('"','""')}"`};
