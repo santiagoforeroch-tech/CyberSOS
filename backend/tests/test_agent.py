@@ -22,6 +22,12 @@ def test_local_agent_recognizes_each_incident_category(category, message):
     assert result.message
 
 
+def test_local_agent_does_not_keep_passwords_or_codes():
+    result = _local_chat(AgentChatRequest(messages=[{"role": "user", "content": "Me hackearon; contraseña: Secreta123 y código 123456"}]))
+    assert "Secreta123" not in result.draft.summary
+    assert "123456" not in result.draft.summary
+
+
 @pytest.mark.anyio
 async def test_agent_uses_safe_local_fallback_without_gemini(monkeypatch):
     monkeypatch.setattr(settings, "ai_agent_enabled", False)

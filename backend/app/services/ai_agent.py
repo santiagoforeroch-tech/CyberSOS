@@ -1,10 +1,26 @@
 import json
+import re
 
 import httpx
 
 from app.core.config import settings
 from app.schemas.agent import AgentChatRequest, AgentChatResponse, AgentDraft
 from app.schemas.reports import CATEGORIES
+
+
+SENSITIVE_PATTERNS = (
+    (re.compile(r"(?i)(contraseña|contrasena|password)\s*[:=]?\s*\S+"), r"\1 [dato omitido]"),
+    (re.compile(r"(?i)(código|codigo|code|otp|token)\s*[:=]?\s*\d{4,8}"), r"\1 [dato omitido]"),
+    (re.compile(r"\b\d{13,19}\b"), "[dato bancario omitido]"),
+)
+
+
+def _sanitize_content(content: str) -> str:
+    """Evita conservar o enviar accidentalmente secretos escritos por el usuario."""
+    sanitized = content
+    for pattern, replacement in SENSITIVE_PATTERNS:
+        sanitized = pattern.sub(replacement, sanitized)
+    return sanitized
 
 
 SYSTEM_PROMPT = """Eres el agente ciudadano de CyberSOS en Colombia. Ayudas a describir incidentes digitales y preparar un reporte para revisión humana. Responde en español sencillo, con empatía y sin culpar. Puedes contestar preguntas generales de seguridad digital, pero no des asesoría legal definitiva. Nunca pidas contraseñas, códigos MFA, números completos de tarjetas ni dinero. Si hay peligro físico o una emergencia, indica contactar inmediatamente a emergencias y continúa solo si la persona lo desea.
@@ -78,7 +94,7 @@ OTHER_INCIDENT_WORDS = ("problema en internet", "incidente digital", "algo raro"
 
 def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
     """Flujo determinista para desarrollo: no usa red ni claves de proveedor."""
-    text = " ".join(item.content for item in payload.messages if item.role == "user").lower()
+    text = " ".join(_sanitize_content(item.content) for item in payload.messages if item.role == "user").lower()
     # La extorsión es más específica que una amenaza general: priorizarla
     # evita clasificar como acoso los casos que exigen dinero o chantaje.
     extortion_markers = ("extorsión", "extorsion", "chantaje", "no divulgar", "amenazan con publicar", "publicar mis fotos", "difundir mis fotos", "me exigen dinero")
@@ -87,7 +103,7 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
     else:
         category = next((name for name, words in KEYWORDS.items() if any(word in text for word in words)), None)
     assistant_turns = sum(1 for item in payload.messages if item.role == "assistant")
-    facts = [item.content.strip() for item in payload.messages if item.role == "user" and item.content.strip()][-5:]
+    facts = [_sanitize_content(item.content.strip()) for item in payload.messages if item.role == "user" and item.content.strip()][-5:]
     general_answer = next((answer for phrase, answer in GENERAL_ANSWERS.items() if phrase in text), None)
     urgent = any(phrase in text for phrase in URGENT_WORDS)
     if not category and any(phrase in text for phrase in OTHER_INCIDENT_WORDS) and len(facts) >= 2:
@@ -146,11 +162,11 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
         return _local_chat(payload)
     # Enviar solo el contexto reciente reduce el tiempo de procesamiento sin
     # perder los datos relevantes del reporte.
-    contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": item.content}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
+    contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": _sanitize_content(item.content)}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent"
     body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 900}}
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(8.0, connect=3.0)) as client:
             response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
             response.raise_for_status()
         response_data = response.json()
