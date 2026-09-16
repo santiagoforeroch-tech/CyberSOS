@@ -81,12 +81,12 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
     text = " ".join(item.content for item in payload.messages if item.role == "user").lower()
     category = next((name for name, words in KEYWORDS.items() if any(word in text for word in words)), None)
     assistant_turns = sum(1 for item in payload.messages if item.role == "assistant")
+    facts = [item.content.strip() for item in payload.messages if item.role == "user" and item.content.strip()][-5:]
     general_answer = next((answer for phrase, answer in GENERAL_ANSWERS.items() if phrase in text), None)
     urgent = any(phrase in text for phrase in URGENT_WORDS)
     if not category and any(phrase in text for phrase in OTHER_INCIDENT_WORDS) and len(facts) >= 2:
         category = "otro"
     priority = "Crítica" if any(word in text for word in ("peligro", "amenaza física", "extorsión", "chantaje")) else "Alta" if any(word in text for word in ("perdí dinero", "hackearon", "bloqueó")) else "Media"
-    facts = [item.content.strip() for item in payload.messages if item.role == "user" and item.content.strip()][-5:]
     missing = []
     if not category:
         missing.append("Tipo de incidente o qué ocurrió")
@@ -141,44 +141,32 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
     )
     if is_simple_local_request:
         return _local_chat(payload)
-    if settings.ai_local_mode or not settings.ai_agent_enabled or (not settings.gemini_api_key and not settings.openai_api_key):
+    # Gemini es el único proveedor externo del proyecto. El flujo local se
+    # conserva como respaldo para que el ciudadano nunca quede bloqueado.
+    if settings.ai_local_mode or not settings.ai_agent_enabled or not settings.gemini_api_key:
         return _local_chat(payload)
-    if settings.ai_provider == "openai":
-        return await _chat_openai(payload)
     # Enviar solo el contexto reciente reduce el tiempo de procesamiento sin
     # perder los datos relevantes del reporte.
     contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": item.content}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent"
     body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 600}}
-    async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
-        response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
-        response.raise_for_status()
-    response_data = response.json()
-    candidates = response_data.get("candidates") or []
-    if not candidates:
-        raise ValueError("Gemini no devolvió candidatos de respuesta")
-    text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
-    if text.startswith("```"):
-        text = text.removeprefix("```").removeprefix("json").removesuffix("```").strip()
-    result = json.loads(text)
-    parsed = AgentChatResponse.model_validate(result)
+    try:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
+            response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
+            response.raise_for_status()
+        response_data = response.json()
+        candidates = response_data.get("candidates") or []
+        if not candidates:
+            raise ValueError("Gemini no devolvió candidatos de respuesta")
+        response_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
+        if response_text.startswith("```"):
+            response_text = response_text.removeprefix("```").removeprefix("json").removesuffix("```").strip()
+        parsed = AgentChatResponse.model_validate(json.loads(response_text))
+    except Exception:
+        return _local_chat(payload)
     if parsed.draft.category not in (*CATEGORIES, None):
         parsed.draft.category = "otro"
     parsed.ready_to_confirm = bool(parsed.ready_to_confirm and parsed.draft.category and parsed.draft.summary.strip())
     parsed.conversation_id = payload.conversation_id
     return parsed
 
-
-async def _chat_openai(payload: AgentChatRequest) -> AgentChatResponse:
-    if not settings.ai_agent_enabled or not settings.openai_api_key:
-        return AgentChatResponse(message="El asistente IA está pendiente de configuración. Mientras tanto, puedes usar el formulario guiado.", draft=AgentDraft())
-    input_items = [{"role": item.role, "content": item.content} for item in payload.messages[-settings.ai_agent_max_history_messages:]]
-    body = {"model": settings.openai_model, "instructions": SYSTEM_PROMPT, "input": input_items, "store": False, "text": {"format": {"type": "json_object"}}}
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.post("https://api.openai.com/v1/responses", headers={"Authorization": f"Bearer {settings.openai_api_key}"}, json=body)
-        response.raise_for_status()
-    data = response.json()
-    text = data.get("output_text")
-    if not text:
-        text = next(part["text"] for item in data.get("output", []) for part in item.get("content", []) if part.get("type") == "output_text")
-    return AgentChatResponse.model_validate(json.loads(text))

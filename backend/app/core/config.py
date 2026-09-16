@@ -42,12 +42,12 @@ class Settings(BaseSettings):
     clamav_port: int = 3310
     clamav_timeout_seconds: int = 15
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.6-flash"
+    gemini_model: str = "gemini-2.5-flash"
     openai_api_key: str = ""
     openai_model: str = "gpt-5"
     ai_provider: str = "gemini"
-    ai_agent_enabled: bool = False
-    ai_local_mode: bool = True
+    ai_agent_enabled: bool = True
+    ai_local_mode: bool = False
     ai_agent_max_history_messages: int = 20
     telegram_bot_token: str = ""
     telegram_webhook_secret: str = ""
