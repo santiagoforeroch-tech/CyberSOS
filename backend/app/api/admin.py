@@ -60,7 +60,7 @@ def evidence_download(evidence_id: str, db: Session = Depends(get_db)) -> dict:
 
 
 @router.patch("/reports/{report_id}")
-def update(report_id: str, payload: ReportUpdate, db: Session = Depends(get_db)) -> dict:
+def update(report_id: str, payload: ReportUpdate, db: Session = Depends(get_db), admin_id: str = Depends(require_admin)) -> dict:
     report = db.execute(_private_query(select(Report).where(Report.id == report_id))).scalar_one_or_none()
     if not report:
         raise HTTPException(404, "Reporte no encontrado")
@@ -69,15 +69,15 @@ def update(report_id: str, payload: ReportUpdate, db: Session = Depends(get_db))
         if field == "status" and value not in {"Nuevo", "En revisión", "Atendido", "Cerrado"} or field == "priority" and value not in {"Baja", "Media", "Alta", "Crítica"}:
             raise HTTPException(422, "Valor inválido")
         changes[field] = {"before": getattr(report, field), "after": value}; setattr(report, field, value)
-    db.add(CaseHistory(report_id=report.id, action="Caso actualizado", details=changes, actor_type="admin", actor_id="local-admin")); db.commit()
+    db.add(CaseHistory(report_id=report.id, action="Caso actualizado", details=changes, actor_type="admin", actor_id=admin_id)); db.commit()
     return {"message": "Caso actualizado"}
 
 
 @router.post("/reports/{report_id}/observations", status_code=201)
-def observation(report_id: str, payload: ObservationCreate, db: Session = Depends(get_db)) -> dict:
+def observation(report_id: str, payload: ObservationCreate, db: Session = Depends(get_db), admin_id: str = Depends(require_admin)) -> dict:
     if not db.execute(_private_query(select(Report.id).where(Report.id == report_id))).scalar_one_or_none():
         raise HTTPException(404, "Reporte no encontrado")
-    item = Observation(report_id=report_id, text=payload.text); db.add(item); db.flush(); db.add(CaseHistory(report_id=report_id, action="Observación agregada", details={"observation_id": item.id}, actor_type="admin", actor_id="local-admin")); db.commit()
+    item = Observation(report_id=report_id, text=payload.text, admin_user_id=admin_id); db.add(item); db.flush(); db.add(CaseHistory(report_id=report_id, action="Observación agregada", details={"observation_id": item.id}, actor_type="admin", actor_id=admin_id)); db.commit()
     return {"id": item.id, "message": "Observación agregada"}
 
 
