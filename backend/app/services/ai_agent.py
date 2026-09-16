@@ -23,6 +23,15 @@ def _sanitize_content(content: str) -> str:
     return sanitized
 
 
+def _sanitize_response(response: AgentChatResponse) -> AgentChatResponse:
+    response.message = _sanitize_content(response.message)
+    response.draft.summary = _sanitize_content(response.draft.summary)
+    response.draft.facts = [_sanitize_content(item) for item in response.draft.facts]
+    response.draft.missing_information = [_sanitize_content(item) for item in response.draft.missing_information]
+    response.draft.evidence_requested = [_sanitize_content(item) for item in response.draft.evidence_requested]
+    return response
+
+
 SYSTEM_PROMPT = """Eres el agente ciudadano de CyberSOS en Colombia. Ayudas a describir incidentes digitales y preparar un reporte para revisión humana. Responde en español sencillo, con empatía y sin culpar. Puedes contestar preguntas generales de seguridad digital, pero no des asesoría legal definitiva. Nunca pidas contraseñas, códigos MFA, números completos de tarjetas ni dinero. Si hay peligro físico o una emergencia, indica contactar inmediatamente a emergencias y continúa solo si la persona lo desea.
 
 Analiza la conversación y devuelve JSON válido con estas claves: message (respuesta natural y empática), draft (category usando exactamente una categoría válida o null, priority entre Baja/Media/Alta/Crítica, summary, facts, missing_information, evidence_requested, needs_human_review), ready_to_confirm (true solo después de comprender qué ocurrió, cuándo y por qué canal, el impacto, las acciones realizadas y las evidencias; nunca cierres la entrevista tras una o dos respuestas). Haz una sola pregunta clara por turno, reconoce primero lo que la persona acaba de contar y no repitas preguntas ya respondidas. No inventes hechos. Categorías válidas: phishing, fraude/estafa digital, suplantación, robo o acceso no autorizado a cuenta, robo de información, amenaza/acoso digital, extorsión cibernética, malware, otro."""
@@ -152,7 +161,7 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
             message = "Gracias. Ya tengo los datos principales. ¿Hay algún otro detalle importante que deba incluir antes de preparar el borrador?"
     else:
         message = "Gracias por contarme. Para orientarte mejor, dime qué pasó: ¿recibiste un mensaje, perdiste una cuenta, hubo un cobro, publicaron información o te amenazaron? No compartas contraseñas ni códigos."
-    return AgentChatResponse(message=message, draft=AgentDraft(category=category, priority=priority, summary=" ".join(facts), facts=facts, missing_information=missing, evidence_requested=["Capturas, enlaces o archivos relacionados"], needs_human_review=True), ready_to_confirm=ready)
+    return _sanitize_response(AgentChatResponse(message=message, draft=AgentDraft(category=category, priority=priority, summary=" ".join(facts), facts=facts, missing_information=missing, evidence_requested=["Capturas, enlaces o archivos relacionados"], needs_human_review=True), ready_to_confirm=ready))
 
 
 async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
@@ -185,4 +194,4 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
         parsed.draft.category = "otro"
     parsed.ready_to_confirm = bool(parsed.ready_to_confirm and parsed.draft.category and parsed.draft.summary.strip())
     parsed.conversation_id = payload.conversation_id
-    return parsed
+    return _sanitize_response(parsed)
