@@ -145,3 +145,10 @@ No guardar secretos en este archivo.
 - Se actualizó la prueba del frontend para cubrir la pantalla `/reportar` y el envío de un mensaje; el contrato existente de API se mantiene.
 - Verificación: backend del agente 4/4, frontend 6/6 y ESLint correcto. El build de Vite queda bloqueado en `transforming...` por el problema de OneDrive/esbuild ya registrado; no se publicó una versión sin build comprobado.
 - Siguiente paso exacto: ejecutar el build desde una copia local fuera de OneDrive, iniciar FastAPI y Vite, probar el envío y después publicar el commit verificado en Vercel.
+
+# Actualización 2026-09-16 (matriz de casos del chatbot)
+
+- Se verificaron y cubrieron las ocho categorías principales: phishing, fraude/estafa, suplantación, acceso no autorizado, robo de información, amenaza/acoso, extorsión y malware.
+- Se ajustó la prioridad de clasificación para que una amenaza general no oculte un caso de extorsión y para no marcar como extorsión cualquier solicitud de dinero.
+- Pruebas locales del agente: 13/13. Producción: las ocho categorías respondieron HTTP 200 y fueron clasificadas correctamente.
+- El modo local sigue siendo el respaldo mientras se estabiliza la IA; no solicita secretos y mantiene revisión humana antes de crear reportes.
