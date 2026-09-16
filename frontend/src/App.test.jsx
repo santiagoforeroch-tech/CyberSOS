@@ -24,7 +24,7 @@ describe('App', () => {
     render(<App />)
 
     expect(await screen.findByRole('heading', { name: 'Centro de control' })).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Buscar casos, usuarios, recursos…')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Buscar por caso, persona o categoría…')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Evolución de reportes' })).toBeInTheDocument()
   })
 
