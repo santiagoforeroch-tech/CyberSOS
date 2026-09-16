@@ -171,7 +171,10 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
         return _local_chat(payload)
     # Enviar solo el contexto reciente reduce el tiempo de procesamiento sin
     # perder los datos relevantes del reporte.
-    contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": _sanitize_content(item.content)}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
+    # Conserva todo el contexto permitido por el contrato. Limitarlo a ocho
+    # mensajes hacía que el agente olvidara fecha, impacto o evidencias en
+    # conversaciones largas y volviera a hacer preguntas repetidas.
+    contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": _sanitize_content(item.content)}]} for item in payload.messages[-settings.ai_agent_max_history_messages:]]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent"
     body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 900}}
     try:
