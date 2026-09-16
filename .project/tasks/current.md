@@ -35,6 +35,7 @@
 - [x] Renovar el inicio de sesión administrativo con ilustración original de respuesta cibernética y diseño adaptable.
 - [x] Explicar en lenguaje sencillo las categorías de ciberincidentes del formulario público.
 - [x] Fortalecer la bandeja administrativa: filtros por prioridad, actualización manual y mensajes claros ante errores o casos no encontrados.
+- [x] Hacer funcional la acción rápida “Generar informe” del centro de control mediante descarga CSV de los casos visibles.
 - [x] Garantizar que el acceso local use una base SQLite aislada cuando Supabase no esté disponible, sin cambiar la configuración de despliegue.
 - [x] Añadir gráficas administrativas para evolución, estados y prioridades de los reportes.
 - [ ] Verificar el flujo actualizado en navegador antes de usar datos reales.
