@@ -127,3 +127,9 @@
 - [x] Evitar desbordes de textos largos en tablas, detalles, cronologías y confirmaciones.
 - [x] Ajustar navegación del panel administrativo en móvil y recortar el overflow horizontal decorativo.
 - [x] Verificar ESLint, Vitest, build Vite y Pytest antes de publicar.
+
+## Verificación de producción 2026-09-16
+
+- [x] Corregir el mapeo SQLAlchemy de UUID y enums PostgreSQL (`report_source`, `report_status`, `report_priority`) para Supabase.
+- [x] Ejecutar Pytest (25/25), ESLint, Vitest y build Vite.
+- [ ] Confirmar el POST público de creación de reporte cuando el alias de Vercel sirva el despliegue más reciente.

@@ -160,3 +160,10 @@ No guardar secretos en este archivo.
 - Se ajustó la prioridad de clasificación para que una amenaza general no oculte un caso de extorsión y para no marcar como extorsión cualquier solicitud de dinero.
 - Pruebas locales del agente: 13/13. Producción: las ocho categorías respondieron HTTP 200 y fueron clasificadas correctamente.
 - El modo local sigue siendo el respaldo mientras se estabiliza la IA; no solicita secretos y mantiene revisión humana antes de crear reportes.
+
+# Actualización 2026-09-16 (error HTTP 500 al crear reportes)
+
+- La causa confirmada en logs de Vercel era un desajuste de tipos: Supabase exige UUID y enums PostgreSQL, mientras el modelo enviaba VARCHAR.
+- `backend/app/models/case.py` ahora usa UUID nativo en PostgreSQL y `with_variant(ENUM(...))` para los enums de reportes; SQLite conserva compatibilidad de desarrollo.
+- Verificado: Pytest 25/25, ESLint, Vitest y build Vite correctos.
+- Vercel no es la causa raíz y Hostinger no corregiría el problema por sí mismo; ambos ejecutarían el mismo código contra Supabase.

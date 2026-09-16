@@ -31,21 +31,9 @@ class PlatformUUID(TypeDecorator):
         return str(value) if value is not None else None
 
 
-class PlatformEnum(TypeDecorator):
-    """Enum nativo en PostgreSQL y texto validable en SQLite de desarrollo."""
-    impl = String
-    cache_ok = True
-
-    def __init__(self, *values, name, length=24):
-        self.values = values
-        self.enum_name = name
-        self.length = length
-        super().__init__(length=length)
-
-    def load_dialect_impl(self, dialect):
-        if dialect.name == "postgresql":
-            return dialect.type_descriptor(ENUM(*self.values, name=self.enum_name, schema="private", create_type=False))
-        return dialect.type_descriptor(String(self.length))
+def postgres_enum(*values, name, length=24):
+    """Enum nativo en PostgreSQL y texto compatible en SQLite de desarrollo."""
+    return String(length).with_variant(ENUM(*values, name=name, schema="private", create_type=False), "postgresql")
 
 
 class CaseCounter(Base):
@@ -58,7 +46,7 @@ class Report(Base):
     __tablename__ = "reports"
     id: Mapped[str] = mapped_column(PlatformUUID(), primary_key=True, default=lambda: str(uuid4()))
     case_number: Mapped[str] = mapped_column(String(24), unique=True, index=True)
-    source: Mapped[str] = mapped_column(PlatformEnum("web", "whatsapp", name="report_source", length=16), default="web")
+    source: Mapped[str] = mapped_column(postgres_enum("web", "whatsapp", name="report_source", length=16), default="web")
     category: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(Text)
     occurred_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -70,8 +58,8 @@ class Report(Base):
     contact_value: Mapped[str] = mapped_column(String(200))
     # Columna heredada: se conserva para compatibilidad, pero ya no se usa.
     ai_consent: Mapped[bool] = mapped_column(Boolean, default=False)
-    status: Mapped[str] = mapped_column(PlatformEnum("Nuevo", "En revisión", "Atendido", "Cerrado", name="report_status"), default="Nuevo", index=True)
-    priority: Mapped[str] = mapped_column(PlatformEnum("Baja", "Media", "Alta", "Crítica", name="report_priority", length=16), default="Media", index=True)
+    status: Mapped[str] = mapped_column(postgres_enum("Nuevo", "En revisión", "Atendido", "Cerrado", name="report_status"), default="Nuevo", index=True)
+    priority: Mapped[str] = mapped_column(postgres_enum("Baja", "Media", "Alta", "Crítica", name="report_priority", length=16), default="Media", index=True)
     privacy_notice_version: Mapped[str] = mapped_column(String(30), default="v1")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
