@@ -4,7 +4,7 @@ from app.api.whatsapp import admin_router as whatsapp_admin_router, internal_rou
 from app.core.config import settings
 
 from app.schemas.health import HealthResponse
-from app.api import admin, agent, auth, reports, system
+from app.api import admin, agent, auth, reports, system, telegram
 
 api_router = APIRouter()
 api_router.include_router(reports.router)
@@ -12,6 +12,7 @@ api_router.include_router(auth.router)
 api_router.include_router(admin.router)
 api_router.include_router(system.router)
 api_router.include_router(agent.router)
+api_router.include_router(telegram.router)
 
 
 @api_router.get("/health", response_model=HealthResponse, tags=["system"])

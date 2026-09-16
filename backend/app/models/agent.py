@@ -11,6 +11,7 @@ class AgentConversation(Base):
     __tablename__ = "agent_conversations"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     status: Mapped[str] = mapped_column(String(24), default="open")
+    external_key: Mapped[str | None] = mapped_column(String(120), unique=True, nullable=True, index=True)
     report_id: Mapped[str | None] = mapped_column(ForeignKey("reports.id", ondelete="SET NULL"), nullable=True)
     draft: Mapped[dict] = mapped_column(JSON, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
