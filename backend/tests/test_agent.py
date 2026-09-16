@@ -23,6 +23,8 @@ async def test_local_agent_organizes_report_after_two_messages(monkeypatch):
     result = await chat_with_agent(AgentChatRequest(messages=[
         {"role": "user", "content": "Me hicieron una estafa y perdí dinero"},
         {"role": "user", "content": "Ocurrió ayer por WhatsApp; tengo capturas"},
+        {"role": "user", "content": "La consecuencia fue perder dinero y me preocupa que vuelvan a contactarme"},
+        {"role": "user", "content": "Contacté al banco y bloqueé la cuenta"},
     ]))
     assert result.ready_to_confirm is True
     assert result.draft.category == "fraude/estafa digital"
@@ -47,7 +49,7 @@ async def test_local_agent_varies_follow_up_by_incident_and_conversation_step(mo
 
     assert first.draft.category == "phishing"
     assert "whatsapp" in first.message.lower()
-    assert "evidencia" in second.message.lower()
+    assert "consecuencia" in second.message.lower()
     assert account.draft.category == "robo o acceso no autorizado a cuenta"
     assert "contraseña" in account.message.lower()
 

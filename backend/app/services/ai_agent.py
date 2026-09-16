@@ -9,7 +9,7 @@ from app.schemas.reports import CATEGORIES
 
 SYSTEM_PROMPT = """Eres el agente ciudadano de CyberSOS en Colombia. Ayudas a describir incidentes digitales y preparar un reporte para revisión humana. Responde en español sencillo, con empatía y sin culpar. Puedes contestar preguntas generales de seguridad digital, pero no des asesoría legal definitiva. Nunca pidas contraseñas, códigos MFA, números completos de tarjetas ni dinero. Si hay peligro físico o una emergencia, indica contactar inmediatamente a emergencias y continúa solo si la persona lo desea.
 
-Analiza la conversación y devuelve JSON válido con estas claves: message (respuesta natural), draft (category usando exactamente una categoría válida o null, priority entre Baja/Media/Alta/Crítica, summary, facts, missing_information, evidence_requested, needs_human_review), ready_to_confirm (true solo cuando haya descripción suficiente y datos de contacto confirmados). No inventes hechos. Categorías válidas: phishing, fraude/estafa digital, suplantación, robo o acceso no autorizado a cuenta, robo de información, amenaza/acoso digital, extorsión cibernética, malware, otro."""
+Analiza la conversación y devuelve JSON válido con estas claves: message (respuesta natural y empática), draft (category usando exactamente una categoría válida o null, priority entre Baja/Media/Alta/Crítica, summary, facts, missing_information, evidence_requested, needs_human_review), ready_to_confirm (true solo después de comprender qué ocurrió, cuándo y por qué canal, el impacto, las acciones realizadas y las evidencias; nunca cierres la entrevista tras una o dos respuestas). Haz una sola pregunta clara por turno, reconoce primero lo que la persona acaba de contar y no repitas preguntas ya respondidas. No inventes hechos. Categorías válidas: phishing, fraude/estafa digital, suplantación, robo o acceso no autorizado a cuenta, robo de información, amenaza/acoso digital, extorsión cibernética, malware, otro."""
 
 
 KEYWORDS = {
@@ -99,7 +99,8 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
         missing.append("Qué consecuencia tuvo o qué es lo que más te preocupa")
     if not has_evidence:
         missing.append("Si conservas capturas, enlaces, archivos o nombres de usuario")
-    ready = bool(category and len(facts) >= 2 and has_channel_or_date and has_impact)
+    has_actions = any(word in text for word in ("hice", "cambié", "cambie", "bloqueé", "bloquee", "contacté", "contacte", "denuncié", "denuncie", "no hice", "todavía no", "todavia no"))
+    ready = bool(category and len(facts) >= 4 and has_channel_or_date and has_impact and has_actions and has_evidence)
     if urgent:
         message = "Si hay peligro físico o una emergencia, aléjate de la situación y contacta inmediatamente a emergencias o a la autoridad local. No compartas tu ubicación aquí. Si estás a salvo, puedo ayudarte a ordenar los hechos digitales después."
     elif general_answer and not category:
@@ -118,11 +119,13 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
         elif len(facts) == 1:
             message = first_question
         elif not has_channel_or_date:
-            message = "Gracias. Para completar el reporte, ¿cuándo ocurrió y en qué canal o aplicación pasó?"
+            message = "Gracias por explicarlo; entiendo que puede ser preocupante. Para ubicar los hechos, ¿cuándo ocurrió y en qué canal o aplicación pasó?"
+        elif not has_impact:
+            message = "Gracias, ya entiendo mejor la situación. ¿Qué consecuencia tuvo o qué es lo que más te preocupa en este momento?"
+        elif not has_actions:
+            message = "Entiendo. Para saber cómo orientarte, ¿qué hiciste después de notarlo: cambiaste alguna clave, contactaste al banco o todavía no has tomado medidas?"
         elif not has_evidence:
             message = evidence_question
-        elif not has_impact:
-            message = "¿Qué consecuencia tuvo el incidente o qué es lo que más te preocupa ahora?"
         else:
             message = "Gracias. Ya tengo los datos principales. ¿Hay algún otro detalle importante que deba incluir antes de preparar el borrador?"
     else:
