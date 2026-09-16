@@ -135,10 +135,12 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
         return _local_chat(payload)
     if settings.ai_provider == "openai":
         return await _chat_openai(payload)
-    contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": item.content}]} for item in payload.messages[-settings.ai_agent_max_history_messages:]]
+    # Enviar solo el contexto reciente reduce el tiempo de procesamiento sin
+    # perder los datos relevantes del reporte.
+    contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": item.content}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent"
-    body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2}}
-    async with httpx.AsyncClient(timeout=30) as client:
+    body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 600}}
+    async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
         response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
         response.raise_for_status()
     response_data = response.json()
