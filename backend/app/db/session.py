@@ -22,7 +22,10 @@ def get_engine() -> Engine:
     else:
         # Las tablas de CyberSOS viven en el esquema privado de Supabase.
         connect_args = {"options": "-c search_path=private,public"}
-    return create_engine(database_url, pool_pre_ping=True, connect_args=connect_args)
+    engine_options = {"pool_pre_ping": True, "connect_args": connect_args}
+    if not database_url.startswith("sqlite"):
+        engine_options["execution_options"] = {"schema_translate_map": {None: "private"}}
+    return create_engine(database_url, **engine_options)
 
 
 def get_db() -> Generator[Session, None, None]:
