@@ -7,12 +7,13 @@ from app.services.ai_agent import chat_with_agent
 
 
 @pytest.mark.anyio
-async def test_agent_requires_gemini_and_never_uses_local_flow(monkeypatch):
+async def test_agent_uses_safe_local_fallback_without_gemini(monkeypatch):
     monkeypatch.setattr(settings, "ai_agent_enabled", False)
     monkeypatch.setattr(settings, "ai_local_mode", False)
     monkeypatch.setattr(settings, "gemini_api_key", "")
-    with pytest.raises(RuntimeError, match="Gemini no está configurado"):
-        await chat_with_agent(AgentChatRequest(messages=[{"role": "user", "content": "Necesito reportar un caso"}]))
+    result = await chat_with_agent(AgentChatRequest(messages=[{"role": "user", "content": "Necesito reportar un caso"}]))
+    assert result.message
+    assert result.draft.needs_human_review is True
 
 
 @pytest.mark.anyio
@@ -40,6 +41,25 @@ async def test_agent_uses_gemini_response(monkeypatch):
     assert result.message.startswith("Entiendo")
     assert result.draft.category == "phishing"
     assert result.ready_to_confirm is False
+
+
+@pytest.mark.anyio
+async def test_agent_falls_back_when_gemini_is_unavailable(monkeypatch):
+    monkeypatch.setattr(settings, "ai_agent_enabled", True)
+    monkeypatch.setattr(settings, "gemini_api_key", "test-key")
+
+    class FailingClient:
+        async def __aenter__(self):
+            return self
+        async def __aexit__(self, *args):
+            return False
+        async def post(self, *args, **kwargs):
+            raise TimeoutError("provider unavailable")
+
+    monkeypatch.setattr(ai_agent.httpx, "AsyncClient", lambda **kwargs: FailingClient())
+    result = await chat_with_agent(AgentChatRequest(messages=[{"role": "user", "content": "Me hackearon la cuenta"}]))
+    assert result.draft.category == "robo o acceso no autorizado a cuenta"
+    assert result.message
 
 
 def test_agent_message_contract_rejects_unknown_roles():

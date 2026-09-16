@@ -133,3 +133,15 @@ No guardar secretos en este archivo.
 - Pytest completo ejecutado con temporales fuera de OneDrive: 15/15 pruebas correctas.
 - Vitest ejecuta las pruebas de API y WhatsApp, pero se bloquea al cargar `src/App.test.jsx`; queda pendiente aislar ese bloqueo del runner/frontend.
 - Vercel no está enlazado localmente ni hay CLI disponible en esta sesión, por lo que aún no se ha transmitido la clave al proyecto de producción.
+# Actualización 2026-09-16 (reparación del chatbot)
+
+- Se corrigió `backend/app/services/ai_agent.py`: cuando Gemini está desactivado o no hay `GEMINI_API_KEY`, `POST /api/v1/agent/chat` usa el flujo local determinista en lugar de lanzar un error 503.
+- Se actualizó `backend/tests/test_agent.py` para verificar el respaldo seguro.
+- Verificación: llamada directa al servicio respondió y `python -m compileall app` terminó correctamente. Pytest queda pendiente por el bloqueo de permisos de Windows en `C:\Users\Santi\AppData\Local\Temp\pytest-of-Santi`, ya registrado previamente.
+
+# Actualización 2026-09-16 (integración vertical del chatbot)
+
+- El endpoint conserva el modo Gemini y ahora cambia automáticamente al flujo local ante clave ausente, timeout, error HTTP o respuesta inválida del proveedor.
+- Se actualizó la prueba del frontend para cubrir la pantalla `/reportar` y el envío de un mensaje; el contrato existente de API se mantiene.
+- Verificación: backend del agente 4/4, frontend 6/6 y ESLint correcto. El build de Vite queda bloqueado en `transforming...` por el problema de OneDrive/esbuild ya registrado; no se publicó una versión sin build comprobado.
+- Siguiente paso exacto: ejecutar el build desde una copia local fuera de OneDrive, iniciar FastAPI y Vite, probar el envío y después publicar el commit verificado en Vercel.

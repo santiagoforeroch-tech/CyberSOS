@@ -1,12 +1,12 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 
 import App from './App.jsx'
 
 vi.mock('./api/client.js', () => ({
-  apiRequest: vi.fn((path) => Promise.resolve(path.includes('statistics')
-    ? { total: 0, by_status: {} }
-    : { items: [] })),
+  apiRequest: vi.fn((path) => Promise.resolve(path.includes('/agent/chat')
+    ? { conversation_id: null, message: 'Respuesta del asistente: dime cuándo ocurrió.', draft: { category: null, summary: '', facts: [], missing_information: [], evidence_requested: [], needs_human_review: true }, ready_to_confirm: false }
+    : path.includes('statistics') ? { total: 0, by_status: {} } : { items: [] })),
 }))
 
 describe('App', () => {
@@ -23,18 +23,19 @@ describe('App', () => {
     window.location.hash = '#/admin'
     render(<App />)
 
-    expect(await screen.findByRole('heading', { name: 'Hola, Administrador' })).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('Caso, persona o categoría')).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Filtrar por prioridad' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Actualizar' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Centro de control' })).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Buscar casos, usuarios, recursos…')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Evolución de reportes' })).toBeInTheDocument()
   })
 
-  it('explica las categorías del formulario en lenguaje sencillo', async () => {
+  it('muestra el asistente ciudadano y permite enviar un mensaje', async () => {
     window.location.hash = '#/reportar'
     render(<App />)
 
-    expect(await screen.findByText('Mensajes o páginas falsas que se hacen pasar por un banco, empresa o persona para pedir datos.')).toBeInTheDocument()
-    expect(screen.getByText(/No necesitas conocer los términos técnicos/)).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Cuéntame qué ocurrió' })).toBeInTheDocument()
+    const input = screen.getByLabelText('Escribe tu mensaje')
+    fireEvent.change(input, { target: { value: 'Me llegó un enlace falso' } })
+    fireEvent.submit(input.closest('form'))
+    expect(await screen.findByText(/No compartas contraseñas|cuándo ocurrió|qué pasó/i)).toBeInTheDocument()
   })
 })
