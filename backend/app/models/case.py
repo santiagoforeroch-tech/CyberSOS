@@ -86,7 +86,7 @@ class Observation(Base):
     id: Mapped[str] = mapped_column(PlatformUUID(), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     text: Mapped[str] = mapped_column(Text)
-    admin_user_id: Mapped[str] = mapped_column(String(100), default="local-admin")
+    admin_user_id: Mapped[str] = mapped_column(PlatformUUID(), default=lambda: str(uuid4()))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
@@ -97,7 +97,7 @@ class CaseHistory(Base):
     action: Mapped[str] = mapped_column(String(80))
     details: Mapped[dict] = mapped_column(JSON, default=dict)
     actor_type: Mapped[str] = mapped_column(String(20))
-    actor_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    actor_id: Mapped[str | None] = mapped_column(PlatformUUID(), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
