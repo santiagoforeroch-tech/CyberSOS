@@ -79,7 +79,12 @@ OTHER_INCIDENT_WORDS = ("problema en internet", "incidente digital", "algo raro"
 def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
     """Flujo determinista para desarrollo: no usa red ni claves de proveedor."""
     text = " ".join(item.content for item in payload.messages if item.role == "user").lower()
-    category = next((name for name, words in KEYWORDS.items() if any(word in text for word in words)), None)
+    # La extorsión es más específica que una amenaza general: priorizarla
+    # evita clasificar como acoso los casos que exigen dinero o chantaje.
+    if any(word in text for word in KEYWORDS["extorsión cibernética"]):
+        category = "extorsión cibernética"
+    else:
+        category = next((name for name, words in KEYWORDS.items() if any(word in text for word in words)), None)
     assistant_turns = sum(1 for item in payload.messages if item.role == "assistant")
     facts = [item.content.strip() for item in payload.messages if item.role == "user" and item.content.strip()][-5:]
     general_answer = next((answer for phrase, answer in GENERAL_ANSWERS.items() if phrase in text), None)

@@ -62,6 +62,14 @@ async def test_agent_falls_back_when_gemini_is_unavailable(monkeypatch):
     assert result.message
 
 
+@pytest.mark.anyio
+async def test_agent_prioritizes_extortion_over_general_threat(monkeypatch):
+    monkeypatch.setattr(settings, "ai_agent_enabled", False)
+    monkeypatch.setattr(settings, "gemini_api_key", "")
+    result = await chat_with_agent(AgentChatRequest(messages=[{"role": "user", "content": "Me amenazan con publicar mis fotos y me exigen dinero"}]))
+    assert result.draft.category == "extorsión cibernética"
+
+
 def test_agent_message_contract_rejects_unknown_roles():
     with pytest.raises(ValueError):
         AgentChatRequest(messages=[{"role": "system", "content": "no"}])
