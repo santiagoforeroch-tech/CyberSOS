@@ -134,41 +134,24 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
 
 
 async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
-    # El MVP funciona sin claves externas. Los proveedores solo se usan cuando
-    # el modo local se desactiva expresamente en una configuración privada.
-    # Las interacciones simples no necesitan una llamada de red: responderlas
-    # localmente elimina la espera perceptible de Gemini para saludos, dudas
-    # frecuentes y emergencias.
-    latest_user_text = next((item.content.lower().strip() for item in reversed(payload.messages) if item.role == "user"), "")
-    is_simple_local_request = (
-        len(payload.messages) <= 2
-        and (any(phrase in latest_user_text for phrase in GENERAL_ANSWERS) or any(phrase in latest_user_text for phrase in URGENT_WORDS))
-    )
-    if is_simple_local_request:
-        return _local_chat(payload)
-    # Gemini es el único proveedor externo del proyecto. El flujo local se
-    # conserva como respaldo para que el ciudadano nunca quede bloqueado.
     if settings.ai_local_mode or not settings.ai_agent_enabled or not settings.gemini_api_key:
-        return _local_chat(payload)
+        raise RuntimeError("Gemini no está configurado para el asistente")
     # Enviar solo el contexto reciente reduce el tiempo de procesamiento sin
     # perder los datos relevantes del reporte.
     contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": item.content}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent"
     body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 400}}
-    try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
-            response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
-            response.raise_for_status()
-        response_data = response.json()
-        candidates = response_data.get("candidates") or []
-        if not candidates:
-            raise ValueError("Gemini no devolvió candidatos de respuesta")
-        response_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
-        if response_text.startswith("```"):
-            response_text = response_text.removeprefix("```").removeprefix("json").removesuffix("```").strip()
-        parsed = AgentChatResponse.model_validate(json.loads(response_text))
-    except Exception:
-        return _local_chat(payload)
+    async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
+        response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
+        response.raise_for_status()
+    response_data = response.json()
+    candidates = response_data.get("candidates") or []
+    if not candidates:
+        raise ValueError("Gemini no devolvió candidatos de respuesta")
+    response_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
+    if response_text.startswith("```"):
+        response_text = response_text.removeprefix("```").removeprefix("json").removesuffix("```").strip()
+    parsed = AgentChatResponse.model_validate(json.loads(response_text))
     if parsed.draft.category not in (*CATEGORIES, None):
         parsed.draft.category = "otro"
     parsed.ready_to_confirm = bool(parsed.ready_to_confirm and parsed.draft.category and parsed.draft.summary.strip())
