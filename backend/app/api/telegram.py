@@ -66,7 +66,8 @@ async def webhook(request: Request, db: Session = Depends(get_db), secret_header
         return {"ok": True}
     db.add(AgentMessage(conversation_id=conversation.id, role="user", content=text))
     db.flush()
-    history = db.execute(select(AgentMessage).where(AgentMessage.conversation_id == conversation.id).order_by(AgentMessage.created_at)).scalars().all()
+    history = db.execute(select(AgentMessage).where(AgentMessage.conversation_id == conversation.id).order_by(AgentMessage.created_at.desc()).limit(settings.ai_agent_max_history_messages)).scalars().all()
+    history.reverse()
     result = await chat_with_agent(AgentChatRequest(conversation_id=conversation.id, messages=[{"role": item.role, "content": item.content} for item in history]))
     conversation.draft = result.draft.model_dump()
     reply = result.message
