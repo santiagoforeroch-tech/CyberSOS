@@ -149,7 +149,7 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
     # perder los datos relevantes del reporte.
     contents = [{"role": "user" if item.role == "user" else "model", "parts": [{"text": item.content}]} for item in payload.messages[-min(settings.ai_agent_max_history_messages, 8):]]
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.gemini_model}:generateContent"
-    body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 600}}
+    body = {"systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]}, "contents": contents, "generationConfig": {"responseMimeType": "application/json", "temperature": 0.2, "maxOutputTokens": 400}}
     try:
         async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
             response = await client.post(url, headers={"x-goog-api-key": settings.gemini_api_key}, json=body)
@@ -169,4 +169,3 @@ async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
     parsed.ready_to_confirm = bool(parsed.ready_to_confirm and parsed.draft.category and parsed.draft.summary.strip())
     parsed.conversation_id = payload.conversation_id
     return parsed
-

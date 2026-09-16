@@ -20,6 +20,12 @@ async def _send_message(chat_id: int, text: str) -> None:
         response = await client.post(f"https://api.telegram.org/bot{settings.telegram_bot_token}/sendMessage", json={"chat_id": chat_id, "text": text})
         response.raise_for_status()
 
+async def _send_typing(chat_id: int) -> None:
+    if not settings.telegram_bot_token:
+        return
+    async with httpx.AsyncClient(timeout=5) as client:
+        await client.post(f"https://api.telegram.org/bot{settings.telegram_bot_token}/sendChatAction", json={"chat_id": chat_id, "action": "typing"})
+
 @router.post("/webhook")
 async def webhook(request: Request, db: Session = Depends(get_db), secret_header: str | None = Header(default=None, alias="X-Telegram-Bot-Api-Secret-Token")) -> dict:
     if not settings.telegram_enabled:
@@ -32,6 +38,7 @@ async def webhook(request: Request, db: Session = Depends(get_db), secret_header
     text = (message.get("text") or "").strip()
     if not chat_id or not text:
         return {"ok": True}
+    await _send_typing(chat_id)
     external_key = f"telegram:{chat_id}"
     conversation = db.execute(select(AgentConversation).where(AgentConversation.external_key == external_key)).scalar_one_or_none()
     if text.lower() in {"/start", "/reiniciar", "/restart"}:
