@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -19,7 +19,7 @@ class CaseCounter(Base):
 
 class Report(Base):
     __tablename__ = "reports"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     case_number: Mapped[str] = mapped_column(String(24), unique=True, index=True)
     source: Mapped[str] = mapped_column(String(16), default="web")
     category: Mapped[str] = mapped_column(String(80))
@@ -46,7 +46,7 @@ class Report(Base):
 
 class Evidence(Base):
     __tablename__ = "evidences"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     storage_key: Mapped[str] = mapped_column(String(500), unique=True)
     original_name: Mapped[str] = mapped_column(String(255))
@@ -58,7 +58,7 @@ class Evidence(Base):
 
 class Observation(Base):
     __tablename__ = "observations"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     text: Mapped[str] = mapped_column(Text)
     admin_user_id: Mapped[str] = mapped_column(String(100), default="local-admin")
@@ -67,7 +67,7 @@ class Observation(Base):
 
 class CaseHistory(Base):
     __tablename__ = "case_history"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     action: Mapped[str] = mapped_column(String(80))
     details: Mapped[dict] = mapped_column(JSON, default=dict)
@@ -78,7 +78,7 @@ class CaseHistory(Base):
 
 class AIAnalysis(Base):
     __tablename__ = "ai_analyses"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     attempt: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")
