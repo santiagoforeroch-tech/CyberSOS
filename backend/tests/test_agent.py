@@ -3,7 +3,23 @@ import pytest
 from app.core.config import settings
 from app.schemas.agent import AgentChatRequest
 from app.services import ai_agent
-from app.services.ai_agent import chat_with_agent
+from app.services.ai_agent import _local_chat, chat_with_agent
+
+
+@pytest.mark.parametrize("category, message", [
+    ("phishing", "Me llegó un enlace falso del banco"),
+    ("fraude/estafa digital", "Me estafaron y perdí dinero"),
+    ("suplantación", "Crearon un perfil falso con mi foto"),
+    ("robo o acceso no autorizado a cuenta", "Hackearon mi cuenta"),
+    ("robo de información", "Publicaron mis datos personales"),
+    ("amenaza/acoso digital", "Me están acosando y escriben sin parar"),
+    ("extorsión cibernética", "Me chantajean con publicar mis fotos"),
+    ("malware", "Mi computador tiene un virus y bloqueó mis archivos"),
+])
+def test_local_agent_recognizes_each_incident_category(category, message):
+    result = _local_chat(AgentChatRequest(messages=[{"role": "user", "content": message}]))
+    assert result.draft.category == category
+    assert result.message
 
 
 @pytest.mark.anyio

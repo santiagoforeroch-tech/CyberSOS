@@ -81,7 +81,8 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
     text = " ".join(item.content for item in payload.messages if item.role == "user").lower()
     # La extorsión es más específica que una amenaza general: priorizarla
     # evita clasificar como acoso los casos que exigen dinero o chantaje.
-    if any(word in text for word in KEYWORDS["extorsión cibernética"]):
+    extortion_markers = ("extorsión", "extorsion", "chantaje", "no divulgar", "amenazan con publicar", "publicar mis fotos", "difundir mis fotos", "me exigen dinero")
+    if any(word in text for word in extortion_markers):
         category = "extorsión cibernética"
     else:
         category = next((name for name, words in KEYWORDS.items() if any(word in text for word in words)), None)
