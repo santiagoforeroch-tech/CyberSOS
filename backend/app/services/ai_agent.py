@@ -131,6 +131,16 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
 async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
     # El MVP funciona sin claves externas. Los proveedores solo se usan cuando
     # el modo local se desactiva expresamente en una configuración privada.
+    # Las interacciones simples no necesitan una llamada de red: responderlas
+    # localmente elimina la espera perceptible de Gemini para saludos, dudas
+    # frecuentes y emergencias.
+    latest_user_text = next((item.content.lower().strip() for item in reversed(payload.messages) if item.role == "user"), "")
+    is_simple_local_request = (
+        len(payload.messages) <= 2
+        and (any(phrase in latest_user_text for phrase in GENERAL_ANSWERS) or any(phrase in latest_user_text for phrase in URGENT_WORDS))
+    )
+    if is_simple_local_request:
+        return _local_chat(payload)
     if settings.ai_local_mode or not settings.ai_agent_enabled or (not settings.gemini_api_key and not settings.openai_api_key):
         return _local_chat(payload)
     if settings.ai_provider == "openai":
