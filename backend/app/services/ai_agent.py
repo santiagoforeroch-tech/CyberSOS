@@ -134,7 +134,10 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
 
 
 async def chat_with_agent(payload: AgentChatRequest) -> AgentChatResponse:
-    if settings.ai_local_mode or not settings.ai_agent_enabled or not settings.gemini_api_key:
+    # El asistente de producción usa Gemini exclusivamente. `AI_LOCAL_MODE`
+    # se conserva por compatibilidad de configuración, pero no puede desviar
+    # ni bloquear este flujo.
+    if not settings.ai_agent_enabled or not settings.gemini_api_key:
         raise RuntimeError("Gemini no está configurado para el asistente")
     # Enviar solo el contexto reciente reduce el tiempo de procesamiento sin
     # perder los datos relevantes del reporte.
