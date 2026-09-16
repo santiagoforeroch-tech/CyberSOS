@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text, Uuid
+from sqlalchemy import Boolean, CHAR, DateTime, ForeignKey, Integer, JSON, String, Text, TypeDecorator
+from sqlalchemy.dialects.postgresql import UUID as PostgresUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -9,6 +10,25 @@ from app.models.base import Base
 
 def utcnow() -> datetime:
     return datetime.now(timezone.utc)
+
+
+class PlatformUUID(TypeDecorator):
+    """UUID nativo en PostgreSQL y texto compatible en SQLite de desarrollo."""
+    impl = CHAR
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        return dialect.type_descriptor(PostgresUUID(as_uuid=True) if dialect.name == "postgresql" else CHAR(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        from uuid import UUID
+        parsed = value if isinstance(value, UUID) else UUID(str(value))
+        return parsed if dialect.name == "postgresql" else str(parsed)
+
+    def process_result_value(self, value, dialect):
+        return str(value) if value is not None else None
 
 
 class CaseCounter(Base):
@@ -19,7 +39,7 @@ class CaseCounter(Base):
 
 class Report(Base):
     __tablename__ = "reports"
-    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(PlatformUUID(), primary_key=True, default=lambda: str(uuid4()))
     case_number: Mapped[str] = mapped_column(String(24), unique=True, index=True)
     source: Mapped[str] = mapped_column(String(16), default="web")
     category: Mapped[str] = mapped_column(String(80))
@@ -46,7 +66,7 @@ class Report(Base):
 
 class Evidence(Base):
     __tablename__ = "evidences"
-    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(PlatformUUID(), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     storage_key: Mapped[str] = mapped_column(String(500), unique=True)
     original_name: Mapped[str] = mapped_column(String(255))
@@ -58,7 +78,7 @@ class Evidence(Base):
 
 class Observation(Base):
     __tablename__ = "observations"
-    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(PlatformUUID(), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     text: Mapped[str] = mapped_column(Text)
     admin_user_id: Mapped[str] = mapped_column(String(100), default="local-admin")
@@ -67,7 +87,7 @@ class Observation(Base):
 
 class CaseHistory(Base):
     __tablename__ = "case_history"
-    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(PlatformUUID(), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     action: Mapped[str] = mapped_column(String(80))
     details: Mapped[dict] = mapped_column(JSON, default=dict)
@@ -78,7 +98,7 @@ class CaseHistory(Base):
 
 class AIAnalysis(Base):
     __tablename__ = "ai_analyses"
-    id: Mapped[str] = mapped_column(Uuid(as_uuid=False), primary_key=True, default=lambda: str(uuid4()))
+    id: Mapped[str] = mapped_column(PlatformUUID(), primary_key=True, default=lambda: str(uuid4()))
     report_id: Mapped[str] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), index=True)
     attempt: Mapped[int] = mapped_column(Integer, nullable=False)
     status: Mapped[str] = mapped_column(String(16), nullable=False, default="pending")
