@@ -1,5 +1,7 @@
 # Último handoff
 
+- **Actualización 2026-09-16 (acciones rápidas visibles):** Se detectaron reglas CSS antiguas que ocultaban “Reportar caso”, “Generar informe” y “Centro de recursos” del panel. Se eliminaron; las cuatro acciones rápidas ahora se muestran. ESLint, Vitest (6/6) y `git diff --check` correctos.
+
 - **Actualización 2026-09-16 (verificación del panel administrativo):** Se detectó que la acción rápida “Generar informe” solo navegaba a la bandeja y no generaba ningún informe. Ahora descarga un CSV con los casos visibles en el centro de control, incluyendo caso, origen, categoría, estado, prioridad, reportante y fecha. ESLint, Vitest (6/6), Pytest (25/25) y `git diff --check` correctos.
 
 - **Actualización 2026-09-15 (acceso administrativo):** Se corrigió el flujo que enviaba al administrador a validar un código de correo en cada inicio de sesión y dejaba el panel sin sesión válida, provocando “No fue posible actualizar los reportes”. La activación/creación inicial conserva la verificación por correo; los siguientes accesos validan correo y contraseña, establecen la sesión administrativa y abren directamente el panel. Se actualizó el texto del login para explicar esta regla. Verificación: pruebas específicas de backend 5/5, ESLint correcto y build Vite correcto. La batería completa de Pytest sigue limitada por permisos de Windows al explorar la carpeta temporal del usuario.
