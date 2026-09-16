@@ -91,7 +91,7 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
     if not category:
         missing.append("Tipo de incidente o qué ocurrió")
     has_channel_or_date = any(word in text for word in ("ayer", "hoy", "fecha", "semana", "mes", "correo", "sms", "whatsapp", "instagram", "facebook", "telegram", "red social"))
-    has_evidence = any(word in text for word in ("captura", "evidencia", "pantallazo", "enlace", "archivo"))
+    has_evidence = any(word in text for word in ("captura", "capturas", "evidencia", "evidencias", "pantallazo", "pantallazos", "enlace", "link", "archivo", "archivos", "nombre de usuario", "usuario"))
     has_impact = any(word in text for word in ("perdí", "perdi", "daño", "dano", "afectó", "afecto", "entraron", "publicaron", "cobraron", "bloqueó", "bloqueo", "me preocupa", "consecuencia", "resultado"))
     if len(facts) < 2 or not has_channel_or_date:
         missing.append("Cuándo ocurrió y por qué canal o aplicación")
@@ -111,8 +111,10 @@ def _local_chat(payload: AgentChatRequest) -> AgentChatResponse:
             message = "Ya organicé el borrador. Si puedes, conserva capturas, enlaces o archivos relacionados. Revisa el resumen, agrega un medio de contacto y confirma solo si representa correctamente tu caso."
     elif category:
         first_question, evidence_question = FOLLOW_UPS[category]
-        if assistant_turns >= 2 and not has_evidence:
-            message = "Para no repetir preguntas, dime solo una cosa más: ¿conservas alguna captura, enlace, archivo o nombre de usuario relacionado?"
+        previous_assistant_messages = [item.content.lower() for item in payload.messages[:-1] if item.role == "assistant"]
+        already_requested_evidence = any(any(word in message for word in ("evidencia", "captura", "enlace", "archivo", "nombre de usuario")) for message in previous_assistant_messages)
+        if already_requested_evidence and not has_evidence:
+            message = "Para avanzar sin repetir preguntas, dime si conservas alguna prueba relacionada, aunque sea una captura, enlace, archivo o nombre de usuario."
         elif len(facts) == 1:
             message = first_question
         elif not has_channel_or_date:
