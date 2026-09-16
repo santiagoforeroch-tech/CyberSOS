@@ -36,10 +36,13 @@ async def webhook(request: Request, db: Session = Depends(get_db), secret_header
     conversation = db.execute(select(AgentConversation).where(AgentConversation.external_key == external_key)).scalar_one_or_none()
     if text.lower() in {"/start", "/reiniciar", "/restart"}:
         if conversation:
-            conversation.status = "abandoned"
-        conversation = AgentConversation(external_key=external_key)
-        db.add(conversation)
-        db.flush()
+            conversation.status = "open"
+            conversation.report_id = None
+            conversation.draft = {}
+        else:
+            conversation = AgentConversation(external_key=external_key)
+            db.add(conversation)
+            db.flush()
         reply = "Hola. Soy el asistente de CyberSOS. Cuéntame qué ocurrió y te ayudaré a preparar un reporte. No compartas contraseñas ni códigos."
         db.add(AgentMessage(conversation_id=conversation.id, role="assistant", content=reply))
         db.commit()
